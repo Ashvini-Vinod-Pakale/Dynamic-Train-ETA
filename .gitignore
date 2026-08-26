@@ -1,0 +1,14 @@
+﻿# Java / Maven
+backend/target/
+ai-model/models/*.class
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+ai-model/**/*.class
