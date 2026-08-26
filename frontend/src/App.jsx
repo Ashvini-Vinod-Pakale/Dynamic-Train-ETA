@@ -1,7 +1,31 @@
 import { useState } from "react";
+import {
+  LayoutDashboard,
+  Search,
+  Clock3,
+  BrainCircuit,
+  MapPinned,
+  Bell,
+  Train,
+  Menu,
+  ChevronRight,
+  Navigation,
+  Activity,
+  Route,
+  Gauge,
+  CircleAlert,
+  CheckCircle2,
+  CloudSun,
+  Signal,
+} from "lucide-react";
+
 import "./App.css";
 
 function App() {
+  const [activePage, setActivePage] = useState("home");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
   // =========================
   // ETA PREDICTION STATES
   // =========================
@@ -15,6 +39,84 @@ function App() {
   const [futureDelayData, setFutureDelayData] = useState(null);
   const [futureDelayLoading, setFutureDelayLoading] = useState(false);
   const [futureDelayError, setFutureDelayError] = useState("");
+
+  // =========================
+  // TRAIN DATA
+  // =========================
+  const trains = [
+    {
+      number: "12110",
+      name: "Deccan Queen",
+      route: "Pune → Mumbai CST",
+      delay: "15 min delay",
+      status: "Delayed",
+    },
+    {
+      number: "12951",
+      name: "SBC Express",
+      route: "Chennai → Bangalore",
+      delay: "10 min delay",
+      status: "Delayed",
+    },
+    {
+      number: "22691",
+      name: "Rajdhani Express",
+      route: "Delhi → Jaipur",
+      delay: "On time",
+      status: "On Time",
+    },
+  ];
+
+  // =========================
+  // STATION DATA
+  // =========================
+  const predictedDelay =
+    futureDelayData?.predictedFutureDelay;
+
+  const stations = [
+    {
+      name: "Pune Jn",
+      time: "08:00",
+      delay: "On Time",
+      status: "completed",
+    },
+    {
+      name: "Lonavala",
+      time: "08:43",
+      delay: "+5 min",
+      status: "completed",
+    },
+    {
+      name: "Khopoli",
+      time: "09:25",
+      delay: "+15 min",
+      status: "current",
+    },
+    {
+      name: "Panvel",
+      time: "10:10",
+      delay: predictedDelay
+        ? `+${predictedDelay} min`
+        : "+15 min",
+      status: "upcoming",
+    },
+    {
+      name: "Dadar",
+      time: "10:58",
+      delay: predictedDelay
+        ? `+${predictedDelay + 3} min`
+        : "+18 min",
+      status: "upcoming",
+    },
+    {
+      name: "Mumbai CST",
+      time: "11:38",
+      delay: predictedDelay
+        ? `+${predictedDelay + 3} min`
+        : "+18 min",
+      status: "upcoming",
+    },
+  ];
 
   // =========================
   // ETA API
@@ -52,8 +154,6 @@ function App() {
       }
 
       const data = await response.json();
-
-      console.log("ETA Response:", data);
 
       setEtaData(data);
     } catch (err) {
@@ -100,8 +200,6 @@ function App() {
 
       const data = await response.json();
 
-      console.log("Future Delay Response:", data);
-
       setFutureDelayData(data);
     } catch (err) {
       console.error(err);
@@ -115,76 +213,7 @@ function App() {
   };
 
   // =========================
-  // TRAIN DATA
-  // =========================
-  const trains = [
-    {
-      number: "12110",
-      name: "Deccan Queen",
-      route: "Pune → Mumbai CST",
-      delay: "15 min",
-    },
-    {
-      number: "12951",
-      name: "SBC Express",
-      route: "Chennai → Bangalore",
-      delay: "10 min",
-    },
-    {
-      number: "22691",
-      name: "Rajdhani Express",
-      route: "Delhi → Jaipur",
-      delay: "20 min",
-    },
-  ];
-
-  const stations = [
-    {
-      name: "Pune Jn",
-      time: "08:00",
-      delay: "On Time",
-      status: "green",
-    },
-    {
-      name: "Lonavala",
-      time: "08:43",
-      delay: "+5 min",
-      status: "orange",
-    },
-    {
-      name: "Khopoli",
-      time: "09:25",
-      delay: "+15 min",
-      status: "red",
-    },
-    {
-      name: "Panvel",
-      time: "10:10",
-      delay: futureDelayData
-        ? `+${futureDelayData.predictedFutureDelay} min`
-        : "+15 min",
-      status: "red",
-    },
-    {
-      name: "Dadar",
-      time: "10:58",
-      delay: futureDelayData
-        ? `+${futureDelayData.predictedFutureDelay + 3} min`
-        : "+18 min",
-      status: "red",
-    },
-    {
-      name: "Mumbai CST",
-      time: "11:38",
-      delay: futureDelayData
-        ? `+${futureDelayData.predictedFutureDelay + 3} min`
-        : "+18 min",
-      status: "red",
-    },
-  ];
-
-  // =========================
-  // HELPER FUNCTIONS
+  // HELPERS
   // =========================
   const getDelayLevel = (delay) => {
     if (delay >= 15) return "High";
@@ -198,612 +227,1138 @@ function App() {
     return "low";
   };
 
-  const predictedDelay =
-    futureDelayData?.predictedFutureDelay;
+  // =========================
+  // NAVIGATION
+  // =========================
+  const navItems = [
+    {
+      id: "home",
+      label: "Home",
+      icon: LayoutDashboard,
+    },
+    {
+      id: "search",
+      label: "Search Train",
+      icon: Search,
+    },
+    {
+      id: "eta",
+      label: "ETA Prediction",
+      icon: Clock3,
+    },
+    {
+      id: "future",
+      label: "Future Delay",
+      icon: BrainCircuit,
+    },
+    {
+      id: "map",
+      label: "Live Train Map",
+      icon: MapPinned,
+    },
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: Activity,
+    },
+    {
+      id: "alerts",
+      label: "Alerts",
+      icon: Bell,
+    },
+  ];
+
+  const selectTrain = (train) => {
+    setSearchQuery(`${train.number} - ${train.name}`);
+    setActivePage("dashboard");
+  };
+
+  // =========================
+  // HOME PAGE
+  // =========================
+  const renderHome = () => (
+    <div className="page-animation">
+
+      <section className="hero-section">
+        <div className="hero-content">
+
+          <div className="hero-badge">
+            <Activity size={15} />
+            AI-Powered Railway Intelligence
+          </div>
+
+          <h1>
+            Predict Every Journey
+            <span> Before It Happens.</span>
+          </h1>
+
+          <p>
+            Dynamic Train ETA uses intelligent prediction to estimate
+            arrival times, analyze delays, and track train journeys
+            in real time.
+          </p>
+
+          <div className="hero-actions">
+            <button
+              className="primary-btn"
+              onClick={() => setActivePage("search")}
+            >
+              <Search size={18} />
+              Search Train
+            </button>
+
+            <button
+              className="secondary-btn"
+              onClick={() => setActivePage("dashboard")}
+            >
+              View Live Dashboard
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          <div className="hero-stats">
+            <div>
+              <strong>24/7</strong>
+              <span>Live Monitoring</span>
+            </div>
+
+            <div>
+              <strong>AI</strong>
+              <span>Delay Prediction</span>
+            </div>
+
+            <div>
+              <strong>99%</strong>
+              <span>System Availability</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div className="hero-visual">
+
+          <div className="railway-image"></div>
+
+          <div className="image-overlay"></div>
+          <div className="train-motion-effect"></div>
+
+          <div className="speed-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div className="hero-train-content">
+
+            <div className="tracking-label">
+              CURRENTLY TRACKING
+            </div>
+
+            <h3>12110</h3>
+
+            <h2>Deccan Queen</h2>
+
+            <p>Pune → Mumbai CST</p>
+
+          </div>
+
+          <div className="live-status">
+            <span></span>
+            LIVE
+          </div>
+
+          <div className="train-card-footer">
+
+            <div>
+              <span>Current Speed</span>
+              <strong>64 km/h</strong>
+            </div>
+
+            <div>
+              <span>Current Delay</span>
+              <strong className="orange-text">+15 min</strong>
+            </div>
+
+            <div>
+              <span>Confidence</span>
+              <strong className="green-text">
+                {etaData
+                  ? `${etaData.confidenceScore}%`
+                  : "92%"}
+              </strong>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <section className="home-section">
+
+        <div className="section-title">
+          <div>
+            <span>LIVE NETWORK</span>
+            <h2>Popular Train Tracking</h2>
+          </div>
+
+          <button onClick={() => setActivePage("search")}>
+            View All <ChevronRight size={17} />
+          </button>
+        </div>
+
+        <div className="popular-trains-grid">
+
+          {trains.map((train, index) => (
+            <div
+              className="popular-train-card"
+              key={train.number}
+              style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => selectTrain(train)}
+            >
+
+              <div className="train-card-header">
+                <div className="train-number-icon">
+                  <Train size={21} />
+                </div>
+
+                <span
+                  className={
+                    train.status === "On Time"
+                      ? "status-green"
+                      : "status-orange"
+                  }
+                >
+                  {train.status}
+                </span>
+              </div>
+
+              <h3>{train.number}</h3>
+              <h4>{train.name}</h4>
+
+              <p>{train.route}</p>
+
+              <div className="train-card-bottom">
+                <span>{train.delay}</span>
+
+                <ChevronRight size={19} />
+              </div>
+
+            </div>
+          ))}
+
+        </div>
+
+      </section>
+
+      <section className="insight-grid">
+
+        <div className="insight-card blue-card">
+          <div className="insight-icon">
+            <Navigation size={25} />
+          </div>
+
+          <div>
+            <span>ACTIVE TRAINS</span>
+            <h3>1,248</h3>
+            <p>Being monitored across the network</p>
+          </div>
+        </div>
+
+        <div className="insight-card orange-card">
+          <div className="insight-icon">
+            <Clock3 size={25} />
+          </div>
+
+          <div>
+            <span>AVERAGE DELAY</span>
+            <h3>8.4 min</h3>
+            <p>Based on current railway conditions</p>
+          </div>
+        </div>
+
+        <div className="insight-card green-card">
+          <div className="insight-icon">
+            <BrainCircuit size={25} />
+          </div>
+
+          <div>
+            <span>PREDICTION CONFIDENCE</span>
+            <h3>94.6%</h3>
+            <p>AI model prediction confidence</p>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  );
+
+  // =========================
+  // SEARCH PAGE
+  // =========================
+  const renderSearch = () => {
+    const filteredTrains = trains.filter((train) =>
+      `${train.number} ${train.name}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    );
+
+    return (
+      <div className="page-animation page-container">
+
+        <div className="page-heading">
+          <span>TRAIN SEARCH</span>
+          <h1>Find Your Train</h1>
+          <p>
+            Search by train number or train name to access
+            live journey and prediction data.
+          </p>
+        </div>
+
+        <div className="search-page-box">
+          <Search size={23} />
+
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Enter train number or train name..."
+          />
+
+          <button
+            className="primary-btn"
+            onClick={() => { }}
+          >
+            Search Train
+          </button>
+        </div>
+
+        <div className="search-results">
+
+          {filteredTrains.map((train) => (
+            <div
+              className="search-result-card"
+              key={train.number}
+            >
+
+              <div className="result-train-icon">
+                <Train size={30} />
+              </div>
+
+              <div className="result-info">
+                <h3>
+                  {train.number} - {train.name}
+                </h3>
+
+                <p>{train.route}</p>
+              </div>
+
+              <div className="result-delay">
+                <span>Current Status</span>
+
+                <strong
+                  className={
+                    train.status === "On Time"
+                      ? "green-text"
+                      : "orange-text"
+                  }
+                >
+                  {train.delay}
+                </strong>
+              </div>
+
+              <button
+                className="view-btn"
+                onClick={() => selectTrain(train)}
+              >
+                Track Train
+                <ChevronRight size={17} />
+              </button>
+
+            </div>
+          ))}
+
+        </div>
+
+      </div>
+    );
+  };
+
+  // =========================
+  // ETA PAGE
+  // =========================
+  const renderETA = () => (
+    <div className="page-animation page-container">
+
+      <div className="page-heading">
+        <span>AI ETA ENGINE</span>
+        <h1>Estimated Time of Arrival</h1>
+
+        <p>
+          Predict dynamic arrival time based on train speed,
+          current delay, weather, and traffic conditions.
+        </p>
+      </div>
+
+      <div className="prediction-layout">
+
+        <div className="prediction-info-card">
+
+          <div className="prediction-card-header">
+            <div className="gradient-icon blue-gradient">
+              <Clock3 size={28} />
+            </div>
+
+            <div>
+              <span>SELECTED TRAIN</span>
+              <h3>12110 - Deccan Queen</h3>
+            </div>
+          </div>
+
+          <div className="prediction-input-summary">
+
+            <div>
+              <span>Current Location</span>
+              <strong>Khopoli</strong>
+            </div>
+
+            <div>
+              <span>Next Station</span>
+              <strong>Panvel</strong>
+            </div>
+
+            <div>
+              <span>Current Speed</span>
+              <strong>64 km/h</strong>
+            </div>
+
+            <div>
+              <span>Current Delay</span>
+              <strong className="orange-text">15 min</strong>
+            </div>
+
+          </div>
+
+          <button
+            className="prediction-button"
+            onClick={predictETA}
+            disabled={loading}
+          >
+            <BrainCircuit size={20} />
+
+            {loading
+              ? "Analyzing Train Data..."
+              : "Generate ETA Prediction"}
+          </button>
+
+          {error && (
+            <div className="error-box">
+              <CircleAlert size={18} />
+              {error}
+            </div>
+          )}
+
+        </div>
+
+        <div className="prediction-result-card">
+
+          <span className="result-label">
+            PREDICTED ARRIVAL
+          </span>
+
+          <div className="eta-result-time">
+            {etaData
+              ? etaData.predictedETA
+              : "--:--"}
+          </div>
+
+          <p>
+            {etaData
+              ? `Expected arrival at ${etaData.nextStation}`
+              : "Run prediction to calculate ETA"}
+          </p>
+
+          <div className="result-metrics">
+
+            <div>
+              <span>Future Delay</span>
+              <strong>
+                {etaData
+                  ? `${etaData.futureDelay} min`
+                  : "--"}
+              </strong>
+            </div>
+
+            <div>
+              <span>Total Journey ETA</span>
+              <strong>
+                {etaData
+                  ? `${etaData.etaMinutes} min`
+                  : "--"}
+              </strong>
+            </div>
+
+            <div>
+              <span>Confidence Score</span>
+              <strong className="green-text">
+                {etaData
+                  ? `${etaData.confidenceScore}%`
+                  : "--"}
+              </strong>
+            </div>
+
+          </div>
+
+          {etaData && (
+            <div className="prediction-alert">
+              <CircleAlert size={18} />
+              {etaData.delayAlert}
+            </div>
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+  // =========================
+  // FUTURE DELAY PAGE
+  // =========================
+  const renderFutureDelay = () => (
+    <div className="page-animation page-container">
+
+      <div className="page-heading">
+        <span>AI DELAY FORECAST</span>
+        <h1>Future Delay Prediction</h1>
+
+        <p>
+          Analyze upcoming railway conditions and predict
+          possible delays at future stations.
+        </p>
+      </div>
+
+      <div className="future-page-grid">
+
+        <div className="future-main-card">
+
+          <div className="prediction-card-header">
+            <div className="gradient-icon purple-gradient">
+              <BrainCircuit size={28} />
+            </div>
+
+            <div>
+              <span>AI PREDICTION MODEL</span>
+              <h3>Future Railway Delay Analysis</h3>
+            </div>
+          </div>
+
+          <div className="delay-input-grid">
+
+            <div className="input-stat">
+              <Gauge size={20} />
+              <span>Current Speed</span>
+              <strong>64 km/h</strong>
+            </div>
+
+            <div className="input-stat">
+              <Clock3 size={20} />
+              <span>Current Delay</span>
+              <strong>15 min</strong>
+            </div>
+
+            <div className="input-stat">
+              <CloudSun size={20} />
+              <span>Weather</span>
+              <strong>Stable</strong>
+            </div>
+
+            <div className="input-stat">
+              <Route size={20} />
+              <span>Traffic</span>
+              <strong>Moderate</strong>
+            </div>
+
+          </div>
+
+          <button
+            className="prediction-button purple-button"
+            onClick={predictFutureDelay}
+            disabled={futureDelayLoading}
+          >
+            <BrainCircuit size={20} />
+
+            {futureDelayLoading
+              ? "AI Is Predicting..."
+              : "Predict Future Delay"}
+          </button>
+
+          {futureDelayError && (
+            <div className="error-box">
+              <CircleAlert size={18} />
+              {futureDelayError}
+            </div>
+          )}
+
+        </div>
+
+        <div className="future-result-card">
+
+          <span>AI PREDICTED DELAY</span>
+
+          <h2>
+            +{predictedDelay ?? "--"}
+            <small>
+              {predictedDelay !== undefined
+                ? " min"
+                : ""}
+            </small>
+          </h2>
+
+          <p>
+            Expected additional delay at the next station.
+          </p>
+
+          {predictedDelay !== undefined && (
+            <div
+              className={`delay-level ${getDelayClass(
+                predictedDelay
+              )}`}
+            >
+              {getDelayLevel(predictedDelay)} Delay Risk
+            </div>
+          )}
+
+        </div>
+
+      </div>
+
+      <div className="station-prediction-list">
+
+        <h2>Upcoming Station Forecast</h2>
+
+        {stations.slice(3).map((station, index) => (
+          <div
+            className="station-forecast-row"
+            key={station.name}
+          >
+
+            <div className="forecast-station-icon">
+              <MapPinned size={20} />
+            </div>
+
+            <div className="forecast-station-name">
+              <strong>{station.name}</strong>
+              <span>Scheduled {station.time}</span>
+            </div>
+
+            <div className="forecast-delay">
+              <span>Predicted Delay</span>
+              <strong>
+                {station.delay}
+              </strong>
+            </div>
+
+            <div
+              className={`forecast-risk ${index === 0
+                ? getDelayClass(predictedDelay ?? 15)
+                : "high"
+                }`}
+            >
+              {index === 0
+                ? getDelayLevel(predictedDelay ?? 15)
+                : "High"}
+            </div>
+
+          </div>
+        ))}
+
+      </div>
+
+    </div>
+  );
+
+  // =========================
+  // LIVE MAP PAGE
+  // =========================
+  const renderMap = () => (
+    <div className="page-animation page-container">
+
+      <div className="page-heading">
+        <span>LIVE JOURNEY</span>
+        <h1>Train Route Tracking</h1>
+
+        <p>
+          Visual journey progress from Pune Junction
+          to Mumbai CST.
+        </p>
+      </div>
+
+      <div className="live-map-card">
+
+        <div className="map-header">
+          <div>
+            <span>TRAIN 12110</span>
+            <h2>Deccan Queen</h2>
+            <p>Pune → Mumbai CST</p>
+          </div>
+
+          <div className="map-live-badge">
+            <span></span>
+            LIVE LOCATION
+          </div>
+        </div>
+
+        <div className="journey-timeline">
+
+          {stations.map((station, index) => (
+            <div
+              className="timeline-item"
+              key={station.name}
+            >
+
+              <div className="timeline-track">
+                <div
+                  className={`timeline-dot ${station.status}`}
+                >
+                  {station.status === "current" && (
+                    <Train size={16} />
+                  )}
+                </div>
+
+                {index < stations.length - 1 && (
+                  <div
+                    className={`timeline-line ${index < 2
+                      ? "finished"
+                      : ""
+                      }`}
+                  ></div>
+                )}
+              </div>
+
+              <div className="timeline-content">
+                <strong>{station.name}</strong>
+
+                <span>{station.time}</span>
+
+                <small>{station.delay}</small>
+              </div>
+
+            </div>
+          ))}
+
+        </div>
+
+        <div className="live-train-info">
+          <div>
+            <Navigation size={20} />
+            <span>Current Location</span>
+            <strong>Khopoli</strong>
+          </div>
+
+          <div>
+            <Gauge size={20} />
+            <span>Speed</span>
+            <strong>64 km/h</strong>
+          </div>
+
+          <div>
+            <Route size={20} />
+            <span>Distance Covered</span>
+            <strong>110 / 192 km</strong>
+          </div>
+
+          <div>
+            <Clock3 size={20} />
+            <span>Current Delay</span>
+            <strong className="orange-text">
+              +15 min
+            </strong>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+  // =========================
+  // DASHBOARD PAGE
+  // =========================
+  const renderDashboard = () => (
+    <div className="page-animation page-container">
+
+      <div className="page-heading dashboard-heading">
+        <span>LIVE DASHBOARD</span>
+        <h1>Train Intelligence Center</h1>
+        <p>
+          Real-time overview of train status,
+          ETA prediction, and future delays.
+        </p>
+      </div>
+
+      <div className="dashboard-top-grid">
+
+        <div className="dashboard-summary-card">
+          <div className="summary-icon">
+            <Train size={25} />
+          </div>
+
+          <span>SELECTED TRAIN</span>
+          <h2>12110</h2>
+          <p>Deccan Queen</p>
+
+          <button onClick={() => setActivePage("map")}>
+            View Journey
+            <ChevronRight size={16} />
+          </button>
+        </div>
+
+        <div className="dashboard-summary-card">
+          <div className="summary-icon orange-summary">
+            <Clock3 size={25} />
+          </div>
+
+          <span>ESTIMATED ARRIVAL</span>
+
+          <h2>
+            {etaData
+              ? etaData.predictedETA
+              : "11:38 AM"}
+          </h2>
+
+          <p>
+            {etaData
+              ? etaData.nextStation
+              : "Mumbai CST"}
+          </p>
+
+          <button onClick={() => setActivePage("eta")}>
+            Predict ETA
+            <ChevronRight size={16} />
+          </button>
+        </div>
+
+        <div className="dashboard-summary-card">
+          <div className="summary-icon purple-summary">
+            <BrainCircuit size={25} />
+          </div>
+
+          <span>FUTURE DELAY</span>
+
+          <h2>
+            +{predictedDelay ?? 15} min
+          </h2>
+
+          <p>
+            AI delay forecast
+          </p>
+
+          <button onClick={() => setActivePage("future")}>
+            View Prediction
+            <ChevronRight size={16} />
+          </button>
+        </div>
+
+      </div>
+
+      <div className="dashboard-journey-card">
+
+        <div className="section-title">
+          <div>
+            <span>JOURNEY PROGRESS</span>
+            <h2>Pune → Mumbai CST</h2>
+          </div>
+
+          <div className="journey-live-pill">
+            <span></span>
+            LIVE
+          </div>
+        </div>
+
+        <div className="dashboard-route">
+
+          {stations.map((station, index) => (
+            <div
+              className="dashboard-station"
+              key={station.name}
+            >
+
+              <div className="dashboard-route-line">
+                <div
+                  className={`dashboard-dot ${station.status}`}
+                >
+                  {station.status === "current" && (
+                    <Train size={15} />
+                  )}
+                </div>
+
+                {index < stations.length - 1 && (
+                  <div className="dashboard-line"></div>
+                )}
+              </div>
+
+              <strong>{station.name}</strong>
+              <span>{station.time}</span>
+              <small>{station.delay}</small>
+
+            </div>
+          ))}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+  // =========================
+  // ALERTS PAGE
+  // =========================
+  const renderAlerts = () => (
+    <div className="page-animation page-container">
+
+      <div className="page-heading">
+        <span>RAILWAY NOTIFICATIONS</span>
+        <h1>Live Alerts</h1>
+
+        <p>
+          Important updates generated from
+          current train and prediction data.
+        </p>
+      </div>
+
+      <div className="alerts-page-list">
+
+        <div className="modern-alert danger-modern">
+          <div className="modern-alert-icon">
+            <CircleAlert size={24} />
+          </div>
+
+          <div>
+            <span>HIGH PRIORITY</span>
+            <h3>High Delay Expected</h3>
+
+            <p>
+              Train 12110 may arrive with an
+              additional predicted delay.
+            </p>
+          </div>
+
+          <strong>+18 min</strong>
+        </div>
+
+        <div className="modern-alert warning-modern">
+          <div className="modern-alert-icon">
+            <Signal size={24} />
+          </div>
+
+          <div>
+            <span>NETWORK UPDATE</span>
+            <h3>Traffic Congestion</h3>
+
+            <p>
+              Moderate railway traffic detected
+              between Panvel and Dadar.
+            </p>
+          </div>
+
+          <strong>Monitor</strong>
+        </div>
+
+        <div className="modern-alert info-modern">
+          <div className="modern-alert-icon">
+            <CloudSun size={24} />
+          </div>
+
+          <div>
+            <span>WEATHER UPDATE</span>
+            <h3>Weather Conditions Stable</h3>
+
+            <p>
+              Current weather conditions are not
+              expected to cause major delays.
+            </p>
+          </div>
+
+          <strong>Stable</strong>
+        </div>
+
+        <div className="modern-alert success-modern">
+          <div className="modern-alert-icon">
+            <CheckCircle2 size={24} />
+          </div>
+
+          <div>
+            <span>SYSTEM STATUS</span>
+            <h3>AI Prediction Engine Online</h3>
+
+            <p>
+              Backend prediction services are
+              available and ready for analysis.
+            </p>
+          </div>
+
+          <strong>Online</strong>
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+  // =========================
+  // PAGE RENDERER
+  // =========================
+  const renderPage = () => {
+    switch (activePage) {
+      case "home":
+        return renderHome();
+
+      case "search":
+        return renderSearch();
+
+      case "eta":
+        return renderETA();
+
+      case "future":
+        return renderFutureDelay();
+
+      case "map":
+        return renderMap();
+
+      case "dashboard":
+        return renderDashboard();
+
+      case "alerts":
+        return renderAlerts();
+
+      default:
+        return renderHome();
+    }
+  };
+
+  const currentPageTitle =
+    navItems.find((item) => item.id === activePage)?.label;
 
   return (
     <div className="app">
 
-      {/* ================= SIDEBAR ================= */}
-      <aside className="sidebar">
+      {/* SIDEBAR */}
+      <aside
+        className={`sidebar ${sidebarOpen ? "open" : "collapsed"
+          }`}
+      >
 
-        <div className="logo">
-          <div className="logo-icon">🚆</div>
+        <div className="brand">
 
-          <div>
-            <h2>DynamicTrain AI</h2>
-            <p>Smart ETA & Delay Prediction</p>
+          <div className="brand-icon">
+            <Train size={27} />
           </div>
+
+          {sidebarOpen && (
+            <div className="brand-text">
+              <h2>DynamicTrain</h2>
+              <span>AI Railway Intelligence</span>
+            </div>
+          )}
+
         </div>
 
-        <nav>
-          <button className="nav-item active">
-            🏠 <span>Home</span>
-          </button>
+        <div className="nav-section-label">
+          {sidebarOpen && "MAIN MENU"}
+        </div>
 
-          <button className="nav-item">
-            🔍 <span>Search Train</span>
-          </button>
+        <nav className="sidebar-nav">
 
-          <button className="nav-item">
-            🚆 <span>ETA Prediction</span>
-          </button>
+          {navItems.map((item) => {
+            const Icon = item.icon;
 
-          <button className="nav-item">
-            ⏳ <span>Future Delay</span>
-          </button>
+            return (
+              <button
+                key={item.id}
+                className={`nav-item ${activePage === item.id
+                  ? "active"
+                  : ""
+                  }`}
+                onClick={() => setActivePage(item.id)}
+              >
 
-          <button className="nav-item">
-            📍 <span>Live Train Map</span>
-          </button>
+                <Icon size={20} />
 
-          <button className="nav-item">
-            📊 <span>Dashboard</span>
-          </button>
+                {sidebarOpen && (
+                  <span>{item.label}</span>
+                )}
 
-          <button className="nav-item">
-            🔔 <span>Alerts</span>
-          </button>
+              </button>
+            );
+          })}
+
         </nav>
 
-        <div className="sidebar-info">
-          <div className="ai-icon">🤖</div>
+        <div className="sidebar-bottom">
 
-          <h3>AI-Powered Predictions</h3>
+          {sidebarOpen && (
+            <div className="ai-powered-card">
 
-          <p>
-            Smart train arrival and delay prediction using real-time data.
-          </p>
+              <div className="ai-powered-icon">
+                <BrainCircuit size={22} />
+              </div>
+
+              <div>
+                <strong>AI Powered</strong>
+                <span>Smart predictions active</span>
+              </div>
+
+            </div>
+          )}
+
         </div>
 
       </aside>
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* MAIN */}
       <main className="main-content">
 
-        {/* ================= HEADER ================= */}
+        {/* TOP BAR */}
         <header className="topbar">
 
-          <button className="menu-btn">
-            ☰
+          <button
+            className="menu-toggle"
+            onClick={() =>
+              setSidebarOpen(!sidebarOpen)
+            }
+          >
+            <Menu size={21} />
           </button>
 
-          <div className="page-title">
-            <h1>
-              Dynamic <span>Train ETA</span> System
-            </h1>
-
-            <p>
-              AI-Powered Real-Time Train Arrival & Delay Prediction
-            </p>
+          <div className="topbar-page-name">
+            <span>Dynamic Train ETA</span>
+            <strong>{currentPageTitle}</strong>
           </div>
 
-          <div className="system-status">
-            <span className="online-dot">●</span>
-            System Online
-          </div>
+          <div className="topbar-right">
 
-          <div className="notification">
-            🔔
+            <div className="system-online">
+              <span></span>
+              System Online
+            </div>
+
+            <button
+              className="notification-btn"
+              onClick={() => setActivePage("alerts")}
+            >
+              <Bell size={20} />
+            </button>
+
           </div>
 
         </header>
 
-        {/* ================= DASHBOARD ================= */}
-        <section className="dashboard">
-
-          {/* ================= SEARCH TRAIN ================= */}
-          <div className="card search-card">
-
-            <h3>🔎 Search & Select Train</h3>
-
-            <p>
-              Search your train to view live status
-            </p>
-
-            <div className="search-box">
-              <input placeholder="Enter Train Number or Name" />
-
-              <button>
-                Search
-              </button>
-            </div>
-
-            <h4>Popular Trains</h4>
-
-            <div className="train-list">
-
-              {trains.map((train) => (
-
-                <div
-                  className="train-item"
-                  key={train.number}
-                >
-
-                  <div>
-                    <strong>
-                      {train.number}
-                    </strong>
-
-                    <p>
-                      {train.name}
-                    </p>
-                  </div>
-
-                  <div className="train-route">
-
-                    <span>
-                      {train.route}
-                    </span>
-
-                    <small>
-                      {train.delay}
-                    </small>
-
-                  </div>
-
-                  <span className="arrow">
-                    ›
-                  </span>
-
-                </div>
-
-              ))}
-
-            </div>
-
-          </div>
-
-          {/* ================= JOURNEY ================= */}
-          <div className="card journey-card">
-
-            <div className="section-heading">
-
-              <div>
-                <h3>
-                  🚆 Train Journey Overview
-                </h3>
-
-                <p>
-                  12110 - Deccan Queen | Pune → Mumbai CST
-                </p>
-              </div>
-
-              <span className="live-badge">
-                ● LIVE
-              </span>
-
-            </div>
-
-            <div className="journey-line">
-
-              {stations.map((station, index) => (
-
-                <div
-                  className="station"
-                  key={station.name}
-                >
-
-                  <div className="line-wrapper">
-
-                    <div
-                      className={`station-dot ${station.status}`}
-                    >
-                      {index === 2 ? "🚆" : ""}
-                    </div>
-
-                    {index < stations.length - 1 && (
-                      <div className="route-line"></div>
-                    )}
-
-                  </div>
-
-                  <strong>
-                    {station.name}
-                  </strong>
-
-                  <span>
-                    {station.time}
-                  </span>
-
-                  <small
-                    className={station.status}
-                  >
-                    {station.delay}
-                  </small>
-
-                </div>
-
-              ))}
-
-            </div>
-
-            <div className="stats-row">
-
-              <div className="stat">
-                <span>Total Delay</span>
-
-                <strong className="danger">
-                  +18 min
-                </strong>
-              </div>
-
-              <div className="stat">
-                <span>Current Delay</span>
-
-                <strong className="warning">
-                  +15 min
-                </strong>
-              </div>
-
-              <div className="stat">
-                <span>Avg. Speed</span>
-
-                <strong>
-                  64 km/h
-                </strong>
-              </div>
-
-              <div className="stat">
-                <span>Distance Covered</span>
-
-                <strong>
-                  110 / 192 km
-                </strong>
-              </div>
-
-              <div className="stat">
-                <span>Expected Arrival</span>
-
-                <strong className="primary">
-                  {etaData
-                    ? etaData.predictedETA
-                    : "11:38 AM"}
-                </strong>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* ================= FUTURE DELAY ================= */}
-          <div className="card future-card">
-
-            <h3>
-              ⏳ Future Delay Prediction
-            </h3>
-
-            <p>
-              Upcoming delay at next stations
-            </p>
-
-            {/* PANVEL */}
-            <div className="future-station">
-
-              <div>
-                <strong>Panvel</strong>
-                <span>10:10 AM</span>
-              </div>
-
-              <b className="warning">
-                +
-                {predictedDelay ?? 15}
-                {" "}min
-              </b>
-
-              <small
-                className={getDelayClass(
-                  predictedDelay ?? 15
-                )}
-              >
-                {getDelayLevel(
-                  predictedDelay ?? 15
-                )}
-              </small>
-
-            </div>
-
-            {/* DADAR */}
-            <div className="future-station">
-
-              <div>
-                <strong>Dadar</strong>
-                <span>10:58 AM</span>
-              </div>
-
-              <b className="danger">
-                +
-                {predictedDelay
-                  ? predictedDelay + 3
-                  : 18}
-                {" "}min
-              </b>
-
-              <small className="high">
-                High
-              </small>
-
-            </div>
-
-            {/* MUMBAI */}
-            <div className="future-station">
-
-              <div>
-                <strong>Mumbai CST</strong>
-                <span>11:38 AM</span>
-              </div>
-
-              <b className="danger">
-                +
-                {predictedDelay
-                  ? predictedDelay + 3
-                  : 18}
-                {" "}min
-              </b>
-
-              <small className="high">
-                High
-              </small>
-
-            </div>
-
-            <button
-              className="predict-btn"
-              onClick={predictFutureDelay}
-              disabled={futureDelayLoading}
-            >
-
-              {futureDelayLoading
-                ? "Predicting..."
-                : "🔮 Predict Future Delay"}
-
-            </button>
-
-            {futureDelayData && (
-
-              <div className="api-result">
-
-                <p>
-                  <strong>
-                    AI Predicted Future Delay:
-                  </strong>
-
-                  {" "}
-                  +{futureDelayData.predictedFutureDelay} min
-                </p>
-
-              </div>
-
-            )}
-
-            {futureDelayError && (
-
-              <p className="error-message">
-                {futureDelayError}
-              </p>
-
-            )}
-
-          </div>
-
-          {/* ================= LIVE MAP ================= */}
-          <div className="card map-card">
-
-            <h3>
-              📍 Live Train Map
-            </h3>
-
-            <p>
-              Real-time location of train on route
-            </p>
-
-            <div className="map-placeholder">
-
-              <div className="map-route">
-
-                <span className="map-point">
-                  Pune
-                </span>
-
-                <div className="map-line"></div>
-
-                <span className="train-marker">
-                  🚆
-                </span>
-
-                <div className="map-line orange-line"></div>
-
-                <span className="map-point">
-                  Panvel
-                </span>
-
-                <div className="map-line red-line"></div>
-
-                <span className="map-point">
-                  Mumbai
-                </span>
-
-              </div>
-
-              <p>
-                Live map will be connected here.
-              </p>
-
-            </div>
-
-          </div>
-
-          {/* ================= ETA PREDICTION ================= */}
-          <div className="card eta-card">
-
-            <h3>
-              ⏰ ETA Prediction
-            </h3>
-
-            <p>
-              AI-powered estimated arrival
-            </p>
-
-            <div className="eta-main">
-
-              <span>
-                Estimated Arrival
-              </span>
-
-              <h2>
-                {etaData
-                  ? etaData.predictedETA
-                  : "Not Predicted"}
-              </h2>
-
-              <p>
-                {etaData
-                  ? etaData.nextStation
-                  : "Select a train"}
-              </p>
-
-            </div>
-
-            <div className="eta-details">
-
-              <div>
-                <span>Current Location</span>
-
-                <strong>
-                  {etaData
-                    ? etaData.currentLocation
-                    : "Khopoli"}
-                </strong>
-              </div>
-
-              <div>
-                <span>Next Station</span>
-
-                <strong>
-                  {etaData
-                    ? etaData.nextStation
-                    : "Panvel"}
-                </strong>
-              </div>
-
-              <div>
-                <span>Confidence</span>
-
-                <strong className="success">
-
-                  {etaData
-                    ? `${etaData.confidenceScore}%`
-                    : "--"}
-
-                </strong>
-
-              </div>
-
-            </div>
-
-            <button
-              className="predict-btn"
-              onClick={predictETA}
-              disabled={loading}
-            >
-
-              {loading
-                ? "Predicting..."
-                : "Predict ETA"}
-
-            </button>
-
-            {etaData && (
-
-              <div className="api-result">
-
-                <p>
-                  <strong>
-                    Future Delay:
-                  </strong>
-
-                  {" "}
-                  {etaData.futureDelay} min
-                </p>
-
-                <p>
-                  <strong>
-                    Total ETA:
-                  </strong>
-
-                  {" "}
-                  {etaData.etaMinutes} min
-                </p>
-
-                <p>
-                  <strong>
-                    Alert:
-                  </strong>
-
-                  {" "}
-                  {etaData.delayAlert}
-                </p>
-
-              </div>
-
-            )}
-
-            {error && (
-
-              <p className="error-message">
-                {error}
-              </p>
-
-            )}
-
-          </div>
-
-          {/* ================= ALERTS ================= */}
-          <div className="card alerts-card">
-
-            <h3>
-              🔔 Recent Alerts
-            </h3>
-
-            <div className="alert danger-alert">
-
-              <strong>
-                High Delay Expected
-              </strong>
-
-              <p>
-                Train 12110 may arrive 18 minutes late.
-              </p>
-
-            </div>
-
-            <div className="alert warning-alert">
-
-              <strong>
-                Traffic Congestion
-              </strong>
-
-              <p>
-                Heavy railway traffic between Panvel and Dadar.
-              </p>
-
-            </div>
-
-            <div className="alert info-alert">
-
-              <strong>
-                Weather Update
-              </strong>
-
-              <p>
-                Current weather conditions are stable.
-              </p>
-
-            </div>
-
-          </div>
-
-        </section>
+        {/* PAGE */}
+        <div className="content-wrapper">
+          {renderPage()}
+        </div>
 
       </main>
 
