@@ -66,7 +66,7 @@ input {
   width: 260px;
   min-height: 100vh;
 
-  background: #ffffff;
+  background: #0b1628;
 
   border-right: 1px solid var(--border);
 
@@ -2865,6 +2865,488 @@ input {
   100% {
     transform: translateX(40px);
     opacity: 0;
+  }
+
+}
+/* =========================
+   LIVE TRAIN MAP
+========================= */
+
+.live-map-card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(210, 214, 230, 0.9);
+  border-radius: 24px;
+  padding: 30px;
+  margin-top: 32px;
+  box-shadow: 0 10px 35px rgba(75, 63, 150, 0.08);
+}
+
+.map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 45px;
+}
+
+.map-header span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #6556c8;
+}
+
+.map-header h2 {
+  margin-top: 8px;
+  font-size: 28px;
+  color: #26364b;
+}
+
+.map-header p {
+  margin-top: 6px;
+  color: #758195;
+  font-size: 15px;
+}
+
+.map-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eaf8f0;
+  color: #159a5b;
+  padding: 9px 16px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.map-live-badge span {
+  width: 8px;
+  height: 8px;
+  background: #21b573;
+  border-radius: 50%;
+  animation: livePulse 1.5s infinite;
+}
+
+@keyframes livePulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* =========================
+   JOURNEY TIMELINE
+========================= */
+
+.journey-timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 25px 0 45px;
+}
+
+.timeline-item {
+  flex: 1;
+  position: relative;
+  text-align: center;
+}
+
+.timeline-track {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.timeline-dot {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  background: #cbd3df;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-dot.completed {
+  background: #21aa6f;
+}
+
+.timeline-dot.current {
+  background: #6556d9;
+  box-shadow: 0 0 0 7px rgba(101, 86, 217, 0.12);
+  animation: trainPulse 2s infinite;
+}
+
+.timeline-dot.upcoming {
+  background: #cbd3df;
+}
+
+@keyframes trainPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(101, 86, 217, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 12px rgba(101, 86, 217, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(101, 86, 217, 0);
+  }
+}
+
+.timeline-line {
+  height: 3px;
+  flex: 1;
+  background: #d9dee8;
+  margin-left: -2px;
+}
+
+.timeline-line.finished {
+  background: #21aa6f;
+}
+
+.timeline-content {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.timeline-content strong {
+  color: #2c3b50;
+  font-size: 14px;
+}
+
+.timeline-content span {
+  color: #7d8898;
+  font-size: 13px;
+}
+
+.timeline-content small {
+  color: #7d8898;
+  font-size: 12px;
+}
+
+
+/* =========================
+   LIVE TRAIN INFORMATION
+========================= */
+
+.live-train-info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 25px;
+}
+
+.live-train-info > div {
+  background: #f7f8fc;
+  border: 1px solid #e3e6ef;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: 0.3s ease;
+}
+
+.live-train-info > div:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(80, 70, 150, 0.1);
+}
+
+.live-train-info svg {
+  color: #6556d9;
+  margin-bottom: 4px;
+}
+
+.live-train-info span {
+  font-size: 12px;
+  color: #7b8798;
+}
+
+.live-train-info strong {
+  font-size: 18px;
+  color: #29384d;
+}
+
+.orange-text {
+  color: #e58a19 !important;
+}
+
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 900px) {
+
+  .journey-timeline {
+    overflow-x: auto;
+    padding-bottom: 15px;
+    gap: 20px;
+  }
+
+  .timeline-item {
+    min-width: 120px;
+  }
+
+  .live-train-info {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .map-header {
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .live-map-card {
+    padding: 20px;
+  }
+
+  .map-header {
+    flex-direction: column;
+  }
+
+  .live-train-info {
+    grid-template-columns: 1fr;
+  }
+
+}
+/* =========================
+   RAILWAY BACKGROUND IMAGE
+========================= */
+
+.content-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background image */
+.content-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: url("./assets/image.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* Increase visibility */
+  opacity: 0.55;
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Keep all content above background */
+.content-wrapper > * {
+  position: relative;
+  z-index: 1;
+}
+/* =========================================
+   RESPONSIVE DESIGN - TABLET
+========================================= */
+
+@media (max-width: 1024px) {
+
+  .sidebar {
+    width: 220px;
+  }
+
+  .dashboard-top-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .live-train-info {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .journey-timeline {
+    overflow-x: auto;
+    padding-bottom: 15px;
+  }
+
+  .timeline-item {
+    min-width: 120px;
+  }
+
+}
+
+
+/* =========================================
+   RESPONSIVE DESIGN - MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .app {
+    display: block;
+  }
+
+  /* Hide sidebar by default */
+  .sidebar {
+    position: fixed;
+
+    top: 0;
+    left: -260px;
+
+    width: 260px;
+    height: 100vh;
+
+    z-index: 1000;
+
+    transition: left 0.3s ease;
+  }
+
+  /* Show sidebar when menu button clicked */
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar.collapsed {
+    left: -260px;
+  }
+
+  /* Main content takes full width */
+  .main-content {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* Topbar */
+  .topbar {
+    padding: 12px 16px;
+  }
+
+  .topbar-page-name {
+    margin-left: 10px;
+  }
+
+  .system-online {
+    display: none;
+  }
+
+  /* Page spacing */
+  .content-wrapper {
+    padding: 20px 16px;
+  }
+
+  /* Headings */
+  .page-heading h1 {
+    font-size: 32px;
+  }
+
+  .page-heading p {
+    font-size: 15px;
+  }
+
+  /* Dashboard cards */
+  .dashboard-top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ETA and Future Delay layout */
+  .prediction-grid,
+  .future-delay-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Live train information */
+  .live-train-info {
+    grid-template-columns: 1fr;
+  }
+
+  /* Search */
+  .search-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-bar button {
+    width: 100%;
+  }
+
+  /* Search train cards */
+  .search-result-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .search-result-card .track-button {
+    width: 100%;
+  }
+
+  /* Journey timeline can scroll horizontally */
+  .journey-timeline {
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 20px;
+    padding-bottom: 20px;
+  }
+
+  .timeline-item {
+    min-width: 110px;
+  }
+
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+
+  .content-wrapper {
+    padding: 16px 12px;
+  }
+
+  .page-heading h1 {
+    font-size: 27px;
+  }
+
+  .page-heading p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .topbar-page-name span {
+    font-size: 11px;
+  }
+
+  .topbar-page-name strong {
+    font-size: 14px;
+  }
+
+  .brand-text h2 {
+    font-size: 20px;
+  }
+
+  .dashboard-card {
+    padding: 20px;
   }
 
 }

@@ -67,56 +67,56 @@ function App() {
     },
   ];
 
-  // =========================
-  // STATION DATA
-  // =========================
-  const predictedDelay =
-    futureDelayData?.predictedFutureDelay;
+    // =========================
+    // STATION DATA
+    // =========================
+    const predictedDelay =
+      futureDelayData?.predictedFutureDelay;
 
-  const stations = [
-    {
-      name: "Pune Jn",
-      time: "08:00",
-      delay: "On Time",
-      status: "completed",
-    },
-    {
-      name: "Lonavala",
-      time: "08:43",
-      delay: "+5 min",
-      status: "completed",
-    },
-    {
-      name: "Khopoli",
-      time: "09:25",
-      delay: "+15 min",
-      status: "current",
-    },
-    {
-      name: "Panvel",
-      time: "10:10",
-      delay: predictedDelay
-        ? `+${predictedDelay} min`
-        : "+15 min",
-      status: "upcoming",
-    },
-    {
-      name: "Dadar",
-      time: "10:58",
-      delay: predictedDelay
-        ? `+${predictedDelay + 3} min`
-        : "+18 min",
-      status: "upcoming",
-    },
-    {
-      name: "Mumbai CST",
-      time: "11:38",
-      delay: predictedDelay
-        ? `+${predictedDelay + 3} min`
-        : "+18 min",
-      status: "upcoming",
-    },
-  ];
+    const stations = [
+      {
+        name: "Pune Jn",
+        time: "08:00",
+        delay: "On Time",
+        status: "completed",
+      },
+      {
+        name: "Lonavala",
+        time: "08:43",
+        delay: "+5 min",
+        status: "completed",
+      },
+      {
+        name: "Khopoli",
+        time: "09:25",
+        delay: "+15 min",
+        status: "current",
+      },
+      {
+        name: "Panvel",
+        time: "10:10",
+        delay: predictedDelay
+          ? `+${predictedDelay} min`
+          : "+15 min",
+        status: "upcoming",
+      },
+      {
+        name: "Dadar",
+        time: "10:58",
+        delay: predictedDelay
+          ? `+${predictedDelay + 3} min`
+          : "+18 min",
+        status: "upcoming",
+      },
+      {
+        name: "Mumbai CST",
+        time: "11:38",
+        delay: predictedDelay
+          ? `+${predictedDelay + 3} min`
+          : "+18 min",
+        status: "upcoming",
+      },
+    ];
 
   // =========================
   // ETA API
