@@ -20,9 +20,20 @@ public class ETAController {
     public ETAResponse predictETA(
             @RequestBody ETARequest request) {
 
+        // ==========================================
+        // STEP 5: IMPROVED DYNAMIC ETA CALCULATION
+        // ==========================================
+
         // Base travel time in minutes
-        double baseTravelTime =
-                (request.routeDistance() / request.currentSpeed()) * 60;
+        double baseTravelTime;
+
+        // Prevent division by zero when train speed is 0
+        if (request.currentSpeed() > 0) {
+            baseTravelTime =
+                    (request.routeDistance() / request.currentSpeed()) * 60;
+        } else {
+            baseTravelTime = 0;
+        }
 
         // Future delay prediction using AI/ML service
         double futureDelay =
@@ -34,7 +45,13 @@ public class ETAController {
                         request.trafficFactor()
                 );
 
-        // Dynamic ETA duration in minutes
+        // ==========================================
+        // DYNAMIC ETA
+        // Base Travel Time
+        // + Current Delay
+        // + Predicted Future Delay
+        // ==========================================
+
         double dynamicETA =
                 baseTravelTime
                 + request.currentDelay()
@@ -52,7 +69,10 @@ public class ETAController {
         String predictedArrivalTime =
                 predictedArrival.format(timeFormatter);
 
-        // Confidence score
+        // ==========================================
+        // CONFIDENCE SCORE
+        // ==========================================
+
         double confidence = calculateConfidence(
                 request.currentDelay(),
                 request.previousDelay(),
@@ -61,26 +81,41 @@ public class ETAController {
                 request.trafficFactor()
         );
 
-        // Delay alert
+        // ==========================================
+        // DELAY ALERT
+        // ==========================================
+
         String delayAlert;
 
         if (futureDelay >= 10) {
+
             delayAlert = "Additional "
                     + round(futureDelay)
                     + " min delay predicted";
+
         } else if (futureDelay > 0) {
+
             delayAlert = "Minor future delay predicted";
+
         } else {
+
             delayAlert = "No additional delay predicted";
         }
 
-        // Train route
+        // ==========================================
+        // TRAIN ROUTE
+        // ==========================================
+
         String[] route = {
                 "Mumbai",
                 "Pune",
                 "Nashik Road",
                 "Manmad"
         };
+
+        // ==========================================
+        // FINAL RESPONSE
+        // ==========================================
 
         return new ETAResponse(
                 request.trainNumber(),
@@ -97,6 +132,10 @@ public class ETAController {
         );
     }
 
+    // ==========================================
+    // CONFIDENCE SCORE CALCULATION
+    // ==========================================
+
     private double calculateConfidence(
             double currentDelay,
             double previousDelay,
@@ -111,27 +150,39 @@ public class ETAController {
 
         confidence -= delayDifference * 1.5;
 
+        // Weather impact
         if (weatherFactor == 1) {
             confidence -= 5.0;
         }
 
+        // Traffic impact
         if (trafficFactor == 1) {
             confidence -= 4.0;
         }
 
+        // High future delay reduces confidence
         if (futureDelay > 15) {
             confidence -= 3.0;
         }
 
+        // Keep confidence between 50% and 99%
         confidence = Math.max(50.0, confidence);
         confidence = Math.min(99.0, confidence);
 
         return confidence;
     }
 
+    // ==========================================
+    // ROUND VALUE
+    // ==========================================
+
     private double round(double value) {
         return Math.round(value * 100.0) / 100.0;
     }
+
+    // ==========================================
+    // ETA REQUEST
+    // ==========================================
 
     public record ETARequest(
             String trainNumber,
@@ -144,6 +195,10 @@ public class ETAController {
             int trafficFactor,
             String nextStation
     ) {}
+
+    // ==========================================
+    // ETA RESPONSE
+    // ==========================================
 
     public record ETAResponse(
             String trainNumber,

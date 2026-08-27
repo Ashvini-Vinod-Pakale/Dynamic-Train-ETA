@@ -1,0 +1,7 @@
+train_number,route_distance_km,current_speed_kmph,current_delay_min,previous_delay_min,weather_factor,traffic_factor,future_delay_min
+12123,180,70,13,10,0,1,7
+12123,180,68,18,15,0,1,10
+12123,180,61,24,22,1,0,12
+12123,180,72,9,7,0,1,5
+12123,180,58,27,25,1,1,16
+12123,180,69,14,11,0,0,7
