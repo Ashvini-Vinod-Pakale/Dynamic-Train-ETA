@@ -1,250 +1,214 @@
 package com.traineta.backend;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
-@RestController
-@RequestMapping("/api")
-@CrossOrigin(origins = "*")
-public class ETAController {
+@Service
+public class FutureDelayService {
 
-    private final FutureDelayService futureDelayService;
+    // ==========================================
+    // TRAINED ML MODEL WEIGHTS
+    // ==========================================
 
-    public ETAController(FutureDelayService futureDelayService) {
-        this.futureDelayService = futureDelayService;
+    private double routeDistanceWeight;
+    private double currentSpeedWeight;
+    private double currentDelayWeight;
+    private double previousDelayWeight;
+    private double weatherFactorWeight;
+    private double trafficFactorWeight;
+    private double bias;
+
+    // ==========================================
+    // CONSTRUCTOR
+    // ==========================================
+
+    public FutureDelayService() {
+        loadModel();
     }
 
     // ==========================================
-    // DYNAMIC ETA PREDICTION
+    // LOAD ML MODEL
     // ==========================================
 
-    @PostMapping("/predict/eta")
-    public ETAResponse predictETA(
-            @RequestBody ETARequest request) {
+    private void loadModel() {
 
-        // ==========================================
-        // 1. BASE TRAVEL TIME
-        // ==========================================
+        try {
 
-        double baseTravelTime =
-                (request.routeDistance()
-                        / request.currentSpeed()) * 60.0;
+            ClassPathResource resource =
+                    new ClassPathResource(
+                            "models/future_delay_model.txt"
+                    );
 
-        // ==========================================
-        // 2. ML FUTURE DELAY PREDICTION
-        // ==========================================
+            try (BufferedReader reader =
+                         new BufferedReader(
+                                 new InputStreamReader(
+                                         resource.getInputStream(),
+                                         StandardCharsets.UTF_8
+                                 )
+                         )) {
 
-        double futureDelay =
-                futureDelayService.predictFutureDelay(
-                        request.currentSpeed(),
-                        request.currentDelay(),
-                        request.previousDelay(),
-                        request.weatherFactor(),
-                        request.trafficFactor(),
-                        request.routeDistance()
-                );
+                String line;
 
-        // ==========================================
-        // 3. DYNAMIC ETA
-        // ==========================================
+                while ((line = reader.readLine()) != null) {
 
-        double dynamicETA =
-                baseTravelTime
-                        + request.currentDelay()
-                        + futureDelay;
+                    line = line.trim();
 
-        // ==========================================
-        // 4. PREDICTED ARRIVAL TIME
-        // ==========================================
+                    if (line.isEmpty()) {
+                        continue;
+                    }
 
-        LocalDateTime predictedArrival =
-                LocalDateTime.now().plusSeconds(
-                        Math.round(dynamicETA * 60.0)
-                );
+                    if (line.startsWith("RouteDistance=")) {
 
-        DateTimeFormatter timeFormatter =
-                DateTimeFormatter.ofPattern("hh:mm a");
+                        routeDistanceWeight =
+                                getValue(line);
 
-        String predictedArrivalTime =
-                predictedArrival.format(timeFormatter);
+                    } else if (line.startsWith("CurrentSpeed=")) {
 
-        // ==========================================
-        // 5. CONFIDENCE SCORE
-        // ==========================================
+                        currentSpeedWeight =
+                                getValue(line);
 
-        double confidence =
-                calculateConfidence(
-                        request.currentDelay(),
-                        request.previousDelay(),
-                        futureDelay,
-                        request.weatherFactor(),
-                        request.trafficFactor()
-                );
+                    } else if (line.startsWith("CurrentDelay=")) {
 
-        // ==========================================
-        // 6. DELAY ALERT
-        // ==========================================
+                        currentDelayWeight =
+                                getValue(line);
 
-        String delayAlert;
+                    } else if (line.startsWith("PreviousDelay=")) {
 
-        if (futureDelay >= 10.0) {
+                        previousDelayWeight =
+                                getValue(line);
 
-            delayAlert =
-                    "Additional "
-                            + round(futureDelay)
-                            + " min delay predicted";
+                    } else if (line.startsWith("WeatherFactor=")) {
 
-        } else if (futureDelay > 0.0) {
+                        weatherFactorWeight =
+                                getValue(line);
 
-            delayAlert =
-                    "Minor future delay predicted";
+                    } else if (line.startsWith("TrafficFactor=")) {
 
-        } else {
+                        trafficFactorWeight =
+                                getValue(line);
 
-            delayAlert =
-                    "No additional delay predicted";
+                    } else if (line.startsWith("Bias=")) {
+
+                        bias =
+                                getValue(line);
+                    }
+                }
+            }
+
+            System.out.println(
+                    "========================================"
+            );
+
+            System.out.println(
+                    "TRAINED ML MODEL LOADED SUCCESSFULLY"
+            );
+
+            System.out.println(
+                    "RouteDistance Weight : "
+                            + routeDistanceWeight
+            );
+
+            System.out.println(
+                    "CurrentSpeed Weight  : "
+                            + currentSpeedWeight
+            );
+
+            System.out.println(
+                    "CurrentDelay Weight  : "
+                            + currentDelayWeight
+            );
+
+            System.out.println(
+                    "PreviousDelay Weight : "
+                            + previousDelayWeight
+            );
+
+            System.out.println(
+                    "WeatherFactor Weight : "
+                            + weatherFactorWeight
+            );
+
+            System.out.println(
+                    "TrafficFactor Weight : "
+                            + trafficFactorWeight
+            );
+
+            System.out.println(
+                    "Bias                 : "
+                            + bias
+            );
+
+            System.out.println(
+                    "========================================"
+            );
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Failed to load future delay ML model",
+                    e
+            );
         }
-
-        // ==========================================
-        // 7. TRAIN ROUTE
-        // ==========================================
-
-        String[] route = {
-                "Mumbai",
-                "Pune",
-                "Nashik Road",
-                "Manmad"
-        };
-
-        // ==========================================
-        // 8. RESPONSE
-        // ==========================================
-
-        return new ETAResponse(
-                request.trainNumber(),
-                request.currentLocation(),
-                request.currentSpeed(),
-                request.currentDelay(),
-                request.nextStation(),
-                round(futureDelay),
-                round(dynamicETA),
-                predictedArrivalTime,
-                round(confidence),
-                delayAlert,
-                route
-        );
     }
 
     // ==========================================
-    // CONFIDENCE SCORE
+    // READ VALUE
     // ==========================================
 
-    private double calculateConfidence(
-            double currentDelay,
-            double previousDelay,
-            double futureDelay,
-            int weatherFactor,
-            int trafficFactor) {
+    private double getValue(String line) {
 
-        double confidence = 95.0;
+        String value =
+                line.substring(
+                        line.indexOf("=") + 1
+                ).trim();
 
-        double delayDifference =
-                Math.abs(
-                        currentDelay
-                                - previousDelay
-                );
-
-        confidence -=
-                delayDifference * 1.5;
-
-        if (weatherFactor == 1) {
-            confidence -= 5.0;
-        }
-
-        if (trafficFactor == 1) {
-            confidence -= 4.0;
-        }
-
-        if (futureDelay > 15.0) {
-            confidence -= 3.0;
-        }
-
-        // Minimum confidence
-        confidence =
-                Math.max(50.0, confidence);
-
-        // Maximum confidence
-        confidence =
-                Math.min(99.0, confidence);
-
-        return confidence;
+        return Double.parseDouble(value);
     }
 
     // ==========================================
-    // ROUND VALUE
+    // FUTURE DELAY PREDICTION
     // ==========================================
 
-    private double round(double value) {
-
-        return Math.round(value * 100.0)
-                / 100.0;
-    }
-
-    // ==========================================
-    // REQUEST
-    // ==========================================
-
-    public record ETARequest(
-
-            String trainNumber,
-
-            String currentLocation,
-
-            double routeDistance,
-
+    public double predictFutureDelay(
             double currentSpeed,
-
             double currentDelay,
-
             double previousDelay,
-
             int weatherFactor,
-
             int trafficFactor,
+            double routeDistance) {
 
-            String nextStation
+        double prediction = bias;
 
-    ) {}
+        prediction +=
+                routeDistanceWeight
+                        * routeDistance;
 
-    // ==========================================
-    // RESPONSE
-    // ==========================================
+        prediction +=
+                currentSpeedWeight
+                        * currentSpeed;
 
-    public record ETAResponse(
+        prediction +=
+                currentDelayWeight
+                        * currentDelay;
 
-            String trainNumber,
+        prediction +=
+                previousDelayWeight
+                        * previousDelay;
 
-            String currentLocation,
+        prediction +=
+                weatherFactorWeight
+                        * weatherFactor;
 
-            double currentSpeed,
+        prediction +=
+                trafficFactorWeight
+                        * trafficFactor;
 
-            double currentDelay,
-
-            String nextStation,
-
-            double futureDelay,
-
-            double etaMinutes,
-
-            String predictedETA,
-
-            double confidenceScore,
-
-            String delayAlert,
-
-            String[] route
-
-    ) {}
+        // Future delay cannot be negative
+        return Math.max(0.0, prediction);
+    }
 }
