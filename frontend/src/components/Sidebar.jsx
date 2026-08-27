@@ -1,12 +1,11 @@
 import {
   LayoutDashboard,
   Search,
-  Clock3,
-  BrainCircuit,
   MapPinned,
   Bell,
   Train,
   Activity,
+  BrainCircuit,
 } from "lucide-react";
 
 function Sidebar({
@@ -26,24 +25,14 @@ function Sidebar({
       icon: Search,
     },
     {
-      id: "eta",
-      label: "ETA Prediction",
-      icon: Clock3,
-    },
-    {
-      id: "future",
-      label: "Future Delay",
-      icon: BrainCircuit,
+      id: "dashboard",
+      label: "Dashboard",
+      icon: Activity,
     },
     {
       id: "map",
       label: "Live Train Map",
       icon: MapPinned,
-    },
-    {
-      id: "dashboard",
-      label: "Dashboard",
-      icon: Activity,
     },
     {
       id: "alerts",
@@ -68,7 +57,10 @@ function Sidebar({
         {sidebarOpen && (
           <div className="brand-text">
             <h2>DynamicTrain</h2>
-            <span>AI Railway Intelligence</span>
+
+            <span>
+              AI Railway Intelligence
+            </span>
           </div>
         )}
 
@@ -100,7 +92,9 @@ function Sidebar({
               <Icon size={20} />
 
               {sidebarOpen && (
-                <span>{item.label}</span>
+                <span>
+                  {item.label}
+                </span>
               )}
             </button>
           );
@@ -119,7 +113,10 @@ function Sidebar({
             </div>
 
             <div>
-              <strong>AI Powered</strong>
+              <strong>
+                AI Powered
+              </strong>
+
               <span>
                 Smart predictions active
               </span>

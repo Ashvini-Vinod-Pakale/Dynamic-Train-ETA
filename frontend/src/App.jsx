@@ -6,51 +6,104 @@ import "./App.css";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 
-// PAGES
+// ACTIVE PAGES ONLY
 import Home from "./pages/Home";
 import SearchTrain from "./pages/SearchTrain";
-import ETAPrediction from "./pages/ETAPrediction";
-import FutureDelay from "./pages/FutureDelay";
-import LiveTrainMap from "./pages/LiveTrainMap";
 import Dashboard from "./pages/Dashboard";
+import LiveTrainMap from "./pages/LiveTrainMap";
 import Alerts from "./pages/Alerts";
 
 function App() {
   // =========================
   // MAIN UI STATES
   // =========================
+
   const [activePage, setActivePage] = useState("home");
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
   const [searchQuery, setSearchQuery] = useState("");
 
   // =========================
-  // DYNAMIC PREDICTION INPUTS
+  // SELECTED TRAIN
   // =========================
-  const [currentSpeed, setCurrentSpeed] = useState(64);
-  const [currentDelay, setCurrentDelay] = useState(15);
-  const [previousDelay, setPreviousDelay] = useState(12);
-  const [weatherFactor, setWeatherFactor] = useState(0);
-  const [trafficFactor, setTrafficFactor] = useState(0);
+
+  const [selectedTrain, setSelectedTrain] = useState(null);
 
   // =========================
-  // ETA PREDICTION STATES
+  // LIVE TRAIN / GPS DATA
   // =========================
+
+  const [liveTrainData, setLiveTrainData] = useState({
+    trainNumber: "12110",
+    currentLatitude: 18.785,
+    currentLongitude: 73.345,
+    currentSpeed: 64,
+    currentDelay: 15,
+    previousDelay: 12,
+    currentStation: "Khopoli",
+    nextStation: "Panvel",
+    weatherFactor: 0,
+    trafficFactor: 0,
+    lastUpdated: new Date().toISOString(),
+  });
+
+  // =========================
+  // ETA DATA
+  // INTERNAL DATA USED BY
+  // DASHBOARD AND ALERTS
+  // =========================
+
   const [etaData, setEtaData] = useState(null);
+
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState("");
 
   // =========================
-  // FUTURE DELAY STATES
+  // FUTURE DELAY DATA
+  // INTERNAL DATA USED BY
+  // DASHBOARD AND ALERTS
   // =========================
-  const [futureDelayData, setFutureDelayData] = useState(null);
+
+  const [futureDelayData, setFutureDelayData] =
+    useState(null);
+
   const [futureDelayLoading, setFutureDelayLoading] =
     useState(false);
-  const [futureDelayError, setFutureDelayError] =
-    useState("");
+
+  // =========================
+  // STATION-WISE PREDICTIONS
+  // =========================
+
+  const [
+    stationPredictions,
+    setStationPredictions,
+  ] = useState([]);
+
+  // =========================
+  // EASY ACCESS VARIABLES
+  // =========================
+
+  const currentSpeed =
+    liveTrainData.currentSpeed;
+
+  const currentDelay =
+    liveTrainData.currentDelay;
+
+  const previousDelay =
+    liveTrainData.previousDelay;
+
+  const weatherFactor =
+    liveTrainData.weatherFactor;
+
+  const trafficFactor =
+    liveTrainData.trafficFactor;
 
   // =========================
   // TRAIN DATA
   // =========================
+
   const trains = [
     {
       number: "12110",
@@ -59,6 +112,7 @@ function App() {
       status: "Delayed",
       delay: "+15 min",
     },
+
     {
       number: "12951",
       name: "Mumbai Rajdhani",
@@ -66,6 +120,7 @@ function App() {
       status: "On Time",
       delay: "On Time",
     },
+
     {
       number: "22691",
       name: "Rajdhani Express",
@@ -78,97 +133,22 @@ function App() {
   // =========================
   // PREDICTED DELAY
   // =========================
+
   const predictedDelay =
     futureDelayData?.predictedFutureDelay ??
-    etaData?.futureDelay;
+    etaData?.futureDelay ??
+    null;
 
   // =========================
-  // STATION DATA
+  // FETCH LIVE GPS DATA
   // =========================
-  const stations = [
-    {
-      name: "Pune Jn",
-      time: "08:00",
-      delay: "On Time",
-      status: "completed",
-    },
-    {
-      name: "Lonavala",
-      time: "08:43",
-      delay: "+5 min",
-      status: "completed",
-    },
-    {
-      name: "Khopoli",
-      time: "09:25",
-      delay: "+15 min",
-      status: "current",
-    },
-    {
-      name: "Panvel",
-      time: "10:10",
-      delay: predictedDelay
-        ? `+${predictedDelay} min`
-        : "+15 min",
-      status: "upcoming",
-    },
-    {
-      name: "Dadar",
-      time: "10:58",
-      delay: predictedDelay
-        ? `+${Math.round(predictedDelay + 3)} min`
-        : "+18 min",
-      status: "upcoming",
-    },
-    {
-      name: "Mumbai CST",
-      time: "11:38",
-      delay: predictedDelay
-        ? `+${Math.round(predictedDelay + 3)} min`
-        : "+18 min",
-      status: "upcoming",
-    },
-  ];
 
-  // =========================
-  // SELECT TRAIN
-  // =========================
-  const selectTrain = (train) => {
-    setSearchQuery(train.number);
-    setActivePage("eta");
-  };
-
-  // =========================
-  // ETA PREDICTION
-  // =========================
-  const predictETA = async () => {
-    setLoading(true);
-    setError("");
-
-    const scheduledArrival = "11:38 AM";
-
+  const fetchLiveTrainData = async (
+    trainNumber = "12110"
+  ) => {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/predict/eta",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            trainNumber: "12110",
-            currentLocation: "Khopoli",
-            routeDistance: 82.0,
-            currentSpeed: parseFloat(currentSpeed),
-            currentDelay: parseFloat(currentDelay),
-            previousDelay: parseFloat(previousDelay),
-            weatherFactor: parseInt(weatherFactor),
-            trafficFactor: parseInt(trafficFactor),
-            nextStation: "Panvel",
-          }),
-        }
+        `http://localhost:8080/api/train/${trainNumber}/live`
       );
 
       if (!response.ok) {
@@ -179,236 +159,220 @@ function App() {
 
       const data = await response.json();
 
-      const futureDelay =
-        parseFloat(data.futureDelay) || 0;
+      const freshTrainData = {
+        trainNumber:
+          data.trainNumber ||
+          trainNumber,
 
-      const totalDelay =
-        parseFloat(currentDelay) + futureDelay;
+        currentLatitude:
+          data.currentLatitude ??
+          18.785,
 
-      const [time, period] =
-        scheduledArrival.split(" ");
+        currentLongitude:
+          data.currentLongitude ??
+          73.345,
 
-      let [hours, minutes] =
-        time.split(":").map(Number);
+        currentSpeed:
+          data.currentSpeed ??
+          64,
 
-      if (period === "PM" && hours !== 12) {
-        hours += 12;
-      }
+        currentDelay:
+          data.currentDelay ??
+          15,
 
-      if (period === "AM" && hours === 12) {
-        hours = 0;
-      }
+        previousDelay:
+          data.previousDelay ??
+          12,
 
-      const predictedTime = new Date();
+        currentStation:
+          data.currentStation ||
+          "Khopoli",
 
-      predictedTime.setHours(hours);
-      predictedTime.setMinutes(
-        minutes + totalDelay
-      );
-      predictedTime.setSeconds(0);
+        nextStation:
+          data.nextStation ||
+          "Panvel",
 
-      const predictedHours =
-        predictedTime.getHours();
+        weatherFactor:
+          data.weatherFactor ??
+          0,
 
-      const predictedMinutes =
-        predictedTime.getMinutes();
+        trafficFactor:
+          data.trafficFactor ??
+          0,
 
-      const predictedPeriod =
-        predictedHours >= 12
-          ? "PM"
-          : "AM";
+        lastUpdated:
+          data.lastUpdated ||
+          new Date().toISOString(),
+      };
 
-      const formattedHours =
-        predictedHours % 12 || 12;
+      setLiveTrainData(freshTrainData);
 
-      const formattedMinutes =
-        predictedMinutes < 10
-          ? `0${predictedMinutes}`
-          : predictedMinutes;
+      return freshTrainData;
 
-      const predictedArrivalTime =
-        `${formattedHours}:${formattedMinutes} ${predictedPeriod}`;
-
-      setEtaData({
-        ...data,
-        scheduledArrival,
-        currentDelay: parseFloat(currentDelay),
-        futureDelay: Math.round(futureDelay),
-        totalDelay: Math.round(totalDelay),
-        predictedETA: predictedArrivalTime,
-      });
-
-      setLoading(false);
-
-    } catch (err) {
+    } catch (error) {
       console.warn(
-        "Backend unavailable, using frontend simulation:",
-        err
+        "Live GPS backend unavailable. Using demo GPS data.",
+        error
       );
 
-      setTimeout(() => {
-        const simulatedFutureDelay =
-          Math.max(
-            0,
-            (parseFloat(currentDelay) * 0.4) +
-            (parseFloat(previousDelay) * 0.3) +
-            (parseFloat(currentSpeed) * -0.1) +
-            (parseInt(weatherFactor) * 2) +
-            (parseInt(trafficFactor) * 3)
-          );
+      const demoTrainData = {
+        trainNumber,
 
-        const roundedFutureDelay =
-          Math.round(simulatedFutureDelay);
+        currentLatitude: 18.785,
 
-        const totalDelay =
-          parseFloat(currentDelay) +
-          roundedFutureDelay;
+        currentLongitude: 73.345,
 
-        const [time, period] =
-          scheduledArrival.split(" ");
+        currentSpeed: 64,
 
-        let [hours, minutes] =
-          time.split(":").map(Number);
+        currentDelay: 15,
 
-        if (
-          period === "PM" &&
-          hours !== 12
-        ) {
-          hours += 12;
-        }
+        previousDelay: 12,
 
-        if (
-          period === "AM" &&
-          hours === 12
-        ) {
-          hours = 0;
-        }
+        currentStation: "Khopoli",
 
-        const predictedTime = new Date();
+        nextStation: "Panvel",
 
-        predictedTime.setHours(hours);
+        weatherFactor: 0,
 
-        predictedTime.setMinutes(
-          minutes + totalDelay
-        );
+        trafficFactor: 0,
 
-        predictedTime.setSeconds(0);
+        lastUpdated:
+          new Date().toISOString(),
+      };
 
-        const predictedHours =
-          predictedTime.getHours();
+      setLiveTrainData(demoTrainData);
 
-        const predictedMinutes =
-          predictedTime.getMinutes();
-
-        const predictedPeriod =
-          predictedHours >= 12
-            ? "PM"
-            : "AM";
-
-        const formattedHours =
-          predictedHours % 12 || 12;
-
-        const formattedMinutes =
-          predictedMinutes < 10
-            ? `0${predictedMinutes}`
-            : predictedMinutes;
-
-        const predictedArrivalTime =
-          `${formattedHours}:${formattedMinutes} ${predictedPeriod}`;
-
-        setEtaData({
-          scheduledArrival,
-
-          currentDelay:
-            parseFloat(currentDelay),
-
-          futureDelay:
-            roundedFutureDelay,
-
-          totalDelay:
-            Math.round(totalDelay),
-
-          predictedETA:
-            predictedArrivalTime,
-
-          nextStation:
-            "Panvel",
-
-          etaMinutes:
-            Math.round(
-              (82.0 / parseFloat(currentSpeed)) * 60
-            ),
-
-          confidenceScore:
-            Math.round(
-              Math.max(
-                50,
-                Math.min(
-                  99,
-                  95 -
-                  (
-                    Math.abs(
-                      parseFloat(currentDelay) -
-                      parseFloat(previousDelay)
-                    ) * 1.5
-                  ) -
-                  (
-                    parseInt(weatherFactor) * 5
-                  ) -
-                  (
-                    parseInt(trafficFactor) * 4
-                  )
-                )
-              )
-            ),
-
-          delayAlert:
-            roundedFutureDelay >= 10
-              ? `Additional ${roundedFutureDelay} min delay predicted`
-              : "Minor future delay predicted",
-        });
-
-        setLoading(false);
-
-      }, 1000);
+      return demoTrainData;
     }
   };
 
   // =========================
-  // FUTURE DELAY PREDICTION
+  // CALCULATE PREDICTED TIME
   // =========================
-  const predictFutureDelay = async () => {
-    setFutureDelayLoading(true);
-    setFutureDelayError("");
+
+  const calculatePredictedTime = (
+    scheduledArrival,
+    totalDelay
+  ) => {
+    const [time, period] =
+      scheduledArrival.split(" ");
+
+    let [hours, minutes] =
+      time.split(":").map(Number);
+
+    if (
+      period === "PM" &&
+      hours !== 12
+    ) {
+      hours += 12;
+    }
+
+    if (
+      period === "AM" &&
+      hours === 12
+    ) {
+      hours = 0;
+    }
+
+    const predictedTime =
+      new Date();
+
+    predictedTime.setHours(hours);
+
+    predictedTime.setMinutes(
+      minutes + Number(totalDelay)
+    );
+
+    predictedTime.setSeconds(0);
+
+    const predictedHours =
+      predictedTime.getHours();
+
+    const predictedMinutes =
+      predictedTime.getMinutes();
+
+    const predictedPeriod =
+      predictedHours >= 12
+        ? "PM"
+        : "AM";
+
+    const formattedHours =
+      predictedHours % 12 || 12;
+
+    const formattedMinutes =
+      predictedMinutes < 10
+        ? `0${predictedMinutes}`
+        : predictedMinutes;
+
+    return `${formattedHours}:${formattedMinutes} ${predictedPeriod}`;
+  };
+
+  // =========================
+  // ETA PREDICTION
+  // INTERNAL AI FUNCTION
+  // =========================
+
+  const predictETA = async (
+    trainNumber = "12110",
+    trainData = liveTrainData
+  ) => {
+    setLoading(true);
+
+    setError("");
+
+    const scheduledArrival =
+      "11:38 AM";
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/predict/future-delay",
-        {
-          method: "POST",
+      const response =
+        await fetch(
+          "http://localhost:8080/api/predict/eta",
+          {
+            method: "POST",
 
-          headers: {
-            "Content-Type": "application/json",
-          },
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
 
-          body: JSON.stringify({
-            currentSpeed:
-              parseFloat(currentSpeed),
+            body: JSON.stringify({
+              trainNumber,
 
-            currentDelay:
-              parseFloat(currentDelay),
+              currentLocation:
+                trainData.currentStation,
 
-            previousDelay:
-              parseFloat(previousDelay),
+              routeDistance: 82,
 
-            weatherFactor:
-              parseInt(weatherFactor),
+              currentSpeed:
+                Number(
+                  trainData.currentSpeed
+                ),
 
-            trafficFactor:
-              parseInt(trafficFactor),
-          }),
-        }
-      );
+              currentDelay:
+                Number(
+                  trainData.currentDelay
+                ),
+
+              previousDelay:
+                Number(
+                  trainData.previousDelay
+                ),
+
+              weatherFactor:
+                Number(
+                  trainData.weatherFactor
+                ),
+
+              trafficFactor:
+                Number(
+                  trainData.trafficFactor
+                ),
+
+              nextStation:
+                trainData.nextStation,
+            }),
+          }
+        );
 
       if (!response.ok) {
         throw new Error(
@@ -419,69 +383,579 @@ function App() {
       const data =
         await response.json();
 
-      setFutureDelayData(data);
+      const futureDelay =
+        Number(data.futureDelay) || 0;
 
-      setFutureDelayLoading(false);
+      const totalDelay =
+        Number(trainData.currentDelay) +
+        futureDelay;
+
+      const predictedETA =
+        calculatePredictedTime(
+          scheduledArrival,
+          totalDelay
+        );
+
+      setEtaData({
+        ...data,
+
+        scheduledArrival,
+
+        currentDelay:
+          Number(
+            trainData.currentDelay
+          ),
+
+        futureDelay:
+          Math.round(futureDelay),
+
+        totalDelay:
+          Math.round(totalDelay),
+
+        predictedETA,
+
+        nextStation:
+          trainData.nextStation,
+      });
 
     } catch (err) {
-
       console.warn(
-        "Backend unavailable, using frontend simulation:",
+        "ETA backend unavailable. Using frontend simulation.",
         err
       );
 
-      setTimeout(() => {
+      const simulatedFutureDelay =
+        Math.max(
+          0,
+
+          Number(
+            trainData.currentDelay
+          ) * 0.4 +
+
+          Number(
+            trainData.previousDelay
+          ) * 0.3 -
+
+          Number(
+            trainData.currentSpeed
+          ) * 0.1 +
+
+          Number(
+            trainData.weatherFactor
+          ) * 2 +
+
+          Number(
+            trainData.trafficFactor
+          ) * 3
+        );
+
+      const roundedFutureDelay =
+        Math.round(
+          simulatedFutureDelay
+        );
+
+      const totalDelay =
+        Number(
+          trainData.currentDelay
+        ) +
+        roundedFutureDelay;
+
+      const predictedETA =
+        calculatePredictedTime(
+          scheduledArrival,
+          totalDelay
+        );
+
+      const confidenceScore =
+        Math.round(
+          Math.max(
+            50,
+
+            Math.min(
+              99,
+
+              95 -
+
+                Math.abs(
+                  Number(
+                    trainData.currentDelay
+                  ) -
+
+                  Number(
+                    trainData.previousDelay
+                  )
+                ) *
+                  1.5 -
+
+                Number(
+                  trainData.weatherFactor
+                ) *
+                  5 -
+
+                Number(
+                  trainData.trafficFactor
+                ) *
+                  4
+            )
+          )
+        );
+
+      setEtaData({
+        scheduledArrival,
+
+        currentDelay:
+          Number(
+            trainData.currentDelay
+          ),
+
+        futureDelay:
+          roundedFutureDelay,
+
+        totalDelay:
+          Math.round(totalDelay),
+
+        predictedETA,
+
+        nextStation:
+          trainData.nextStation,
+
+        etaMinutes:
+          Math.round(
+            (
+              82 /
+              Math.max(
+                1,
+                Number(
+                  trainData.currentSpeed
+                )
+              )
+            ) * 60
+          ),
+
+        confidenceScore,
+      });
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =========================
+  // FUTURE DELAY PREDICTION
+  // INTERNAL AI FUNCTION
+  // =========================
+
+  const predictFutureDelay =
+    async (
+      trainData = liveTrainData
+    ) => {
+      setFutureDelayLoading(true);
+
+      try {
+        const response =
+          await fetch(
+            "http://localhost:8080/api/predict/future-delay",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                currentSpeed:
+                  Number(
+                    trainData.currentSpeed
+                  ),
+
+                currentDelay:
+                  Number(
+                    trainData.currentDelay
+                  ),
+
+                previousDelay:
+                  Number(
+                    trainData.previousDelay
+                  ),
+
+                weatherFactor:
+                  Number(
+                    trainData.weatherFactor
+                  ),
+
+                trafficFactor:
+                  Number(
+                    trainData.trafficFactor
+                  ),
+              }),
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            `HTTP error! status: ${response.status}`
+          );
+        }
+
+        const data =
+          await response.json();
+
+        setFutureDelayData(data);
+
+      } catch (err) {
+        console.warn(
+          "Future delay backend unavailable. Using frontend simulation.",
+          err
+        );
 
         const simulatedFutureDelay =
           Math.max(
             0,
-            (parseFloat(currentDelay) * 0.4) +
-            (parseFloat(previousDelay) * 0.3) +
-            (parseFloat(currentSpeed) * -0.1) +
-            (parseInt(weatherFactor) * 2) +
-            (parseInt(trafficFactor) * 3)
+
+            Number(
+              trainData.currentDelay
+            ) * 0.4 +
+
+            Number(
+              trainData.previousDelay
+            ) * 0.3 -
+
+            Number(
+              trainData.currentSpeed
+            ) * 0.1 +
+
+            Number(
+              trainData.weatherFactor
+            ) * 2 +
+
+            Number(
+              trainData.trafficFactor
+            ) * 3
           );
 
         setFutureDelayData({
           predictedFutureDelay:
             Math.round(
-              simulatedFutureDelay * 100
-            ) / 100,
+              simulatedFutureDelay
+            ),
 
-          confidenceScore:
-            92.4,
+          confidenceScore: 92,
         });
 
+      } finally {
         setFutureDelayLoading(false);
-
-      }, 1000);
-    }
-  };
+      }
+    };
 
   // =========================
-  // DELAY HELPERS
+  // STATION-WISE PREDICTION
   // =========================
-  const getDelayClass = (delay) => {
-    if (delay <= 5) return "low";
-    if (delay <= 15) return "medium";
 
-    return "high";
-  };
+  const predictStationWiseETA =
+    async (
+      trainNumber = "12110",
+      trainData = liveTrainData
+    ) => {
+      try {
+        const response =
+          await fetch(
+            "http://localhost:8080/api/predict/station-wise",
+            {
+              method: "POST",
 
-  const getDelayLevel = (delay) => {
-    if (delay <= 5) return "Low";
-    if (delay <= 15) return "Medium";
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
 
-    return "High";
-  };
+              body: JSON.stringify({
+                trainNumber,
+
+                currentLocation:
+                  trainData.currentStation,
+
+                currentSpeed:
+                  Number(
+                    trainData.currentSpeed
+                  ),
+
+                currentDelay:
+                  Number(
+                    trainData.currentDelay
+                  ),
+
+                previousDelay:
+                  Number(
+                    trainData.previousDelay
+                  ),
+
+                weatherFactor:
+                  Number(
+                    trainData.weatherFactor
+                  ),
+
+                trafficFactor:
+                  Number(
+                    trainData.trafficFactor
+                  ),
+              }),
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            `HTTP error! status: ${response.status}`
+          );
+        }
+
+        const data =
+          await response.json();
+
+        const predictions =
+          data.stationPredictions;
+
+        if (
+          Array.isArray(predictions) &&
+          predictions.length > 0
+        ) {
+          setStationPredictions(
+            predictions
+          );
+        } else {
+          throw new Error(
+            "No station predictions received"
+          );
+        }
+
+      } catch (err) {
+        console.warn(
+          "Station-wise backend unavailable. Using frontend simulation.",
+          err
+        );
+
+        const currentTrainDelay =
+          Number(
+            trainData.currentDelay
+          );
+
+        const panvelDelay =
+          currentTrainDelay + 3;
+
+        const dadarDelay =
+          currentTrainDelay + 6;
+
+        const mumbaiDelay =
+          currentTrainDelay + 6;
+
+        const simulatedPredictions = [
+          {
+            station:
+              trainData.nextStation ||
+              "Panvel",
+
+            scheduledTime:
+              "10:10 AM",
+
+            predictedDelay:
+              Math.round(
+                panvelDelay
+              ),
+
+            predictedETA:
+              calculatePredictedTime(
+                "10:10 AM",
+                panvelDelay
+              ),
+          },
+
+          {
+            station:
+              "Dadar",
+
+            scheduledTime:
+              "10:58 AM",
+
+            predictedDelay:
+              Math.round(
+                dadarDelay
+              ),
+
+            predictedETA:
+              calculatePredictedTime(
+                "10:58 AM",
+                dadarDelay
+              ),
+          },
+
+          {
+            station:
+              "Mumbai CST",
+
+            scheduledTime:
+              "11:38 AM",
+
+            predictedDelay:
+              Math.round(
+                mumbaiDelay
+              ),
+
+            predictedETA:
+              calculatePredictedTime(
+                "11:38 AM",
+                mumbaiDelay
+              ),
+          },
+        ];
+
+        setStationPredictions(
+          simulatedPredictions
+        );
+      }
+    };
+
+  // =========================
+  // STATION DATA
+  // =========================
+
+  const stations = [
+    {
+      name: "Pune Jn",
+      time: "08:00",
+      delay: "On Time",
+      status: "completed",
+    },
+
+    {
+      name: "Lonavala",
+      time: "08:43",
+      delay: "+5 min",
+      status: "completed",
+    },
+
+    {
+      name:
+        liveTrainData.currentStation ||
+        "Khopoli",
+
+      time: "09:25",
+
+      delay:
+        `+${currentDelay} min`,
+
+      status: "current",
+    },
+
+    {
+      name:
+        liveTrainData.nextStation ||
+        "Panvel",
+
+      time: "10:10",
+
+      delay:
+        stationPredictions[0]
+          ?.predictedDelay !== undefined
+          ? `+${stationPredictions[0].predictedDelay} min`
+          : predictedDelay !== null
+            ? `+${Math.round(predictedDelay)} min`
+            : `+${currentDelay} min`,
+
+      status: "upcoming",
+    },
+
+    {
+      name: "Dadar",
+
+      time: "10:58",
+
+      delay:
+        stationPredictions[1]
+          ?.predictedDelay !== undefined
+          ? `+${stationPredictions[1].predictedDelay} min`
+          : "+18 min",
+
+      status: "upcoming",
+    },
+
+    {
+      name: "Mumbai CST",
+
+      time: "11:38",
+
+      delay:
+        stationPredictions[2]
+          ?.predictedDelay !== undefined
+          ? `+${stationPredictions[2].predictedDelay} min`
+          : etaData?.totalDelay !== undefined
+            ? `+${Math.round(
+                etaData.totalDelay
+              )} min`
+            : "+18 min",
+
+      status: "upcoming",
+    },
+  ];
+
+  // =========================
+  // SELECT TRAIN
+  // =========================
+
+  const selectTrain =
+    async (train) => {
+      setSelectedTrain(train);
+
+      setSearchQuery(
+        train.number
+      );
+
+      // CLEAR OLD PREDICTION DATA
+
+      setEtaData(null);
+
+      setFutureDelayData(null);
+
+      setStationPredictions([]);
+
+      // GO TO DASHBOARD
+
+      setActivePage(
+        "dashboard"
+      );
+
+      // GET FRESH LIVE DATA
+
+      const freshTrainData =
+        await fetchLiveTrainData(
+          train.number
+        );
+
+      // RUN ALL PREDICTIONS
+
+      await Promise.all([
+        predictETA(
+          train.number,
+          freshTrainData
+        ),
+
+        predictFutureDelay(
+          freshTrainData
+        ),
+
+        predictStationWiseETA(
+          train.number,
+          freshTrainData
+        ),
+      ]);
+    };
 
   // =========================
   // PAGE RENDERER
+  // ONLY ACTIVE PAGES
   // =========================
+
   const renderPage = () => {
-
     switch (activePage) {
-
       case "home":
         return (
           <Home
@@ -502,63 +976,21 @@ function App() {
           />
         );
 
-      case "eta":
+      case "dashboard":
         return (
-          <ETAPrediction
+          <Dashboard
             etaData={etaData}
-            loading={loading}
-            error={error}
-            predictETA={predictETA}
-
-            currentSpeed={currentSpeed}
-            setCurrentSpeed={setCurrentSpeed}
-
-            currentDelay={currentDelay}
-            setCurrentDelay={setCurrentDelay}
-
-            previousDelay={previousDelay}
-            setPreviousDelay={setPreviousDelay}
-
-            weatherFactor={weatherFactor}
-            setWeatherFactor={setWeatherFactor}
-
-            trafficFactor={trafficFactor}
-            setTrafficFactor={setTrafficFactor}
-          />
-        );
-
-      case "future":
-        return (
-          <FutureDelay
-            futureDelayData={futureDelayData}
-            futureDelayLoading={futureDelayLoading}
-            futureDelayError={futureDelayError}
-
-            predictFutureDelay={
-              predictFutureDelay
-            }
-
             predictedDelay={predictedDelay}
-
-            getDelayClass={getDelayClass}
-            getDelayLevel={getDelayLevel}
-
             stations={stations}
-
-            currentSpeed={currentSpeed}
-            setCurrentSpeed={setCurrentSpeed}
-
-            currentDelay={currentDelay}
-            setCurrentDelay={setCurrentDelay}
-
-            previousDelay={previousDelay}
-            setPreviousDelay={setPreviousDelay}
-
-            weatherFactor={weatherFactor}
-            setWeatherFactor={setWeatherFactor}
-
-            trafficFactor={trafficFactor}
-            setTrafficFactor={setTrafficFactor}
+            stationPredictions={
+              stationPredictions
+            }
+            setActivePage={setActivePage}
+            selectedTrain={selectedTrain}
+            loading={
+              loading ||
+              futureDelayLoading
+            }
           />
         );
 
@@ -568,16 +1000,8 @@ function App() {
             stations={stations}
             currentSpeed={currentSpeed}
             currentDelay={currentDelay}
-          />
-        );
-
-      case "dashboard":
-        return (
-          <Dashboard
-            etaData={etaData}
-            predictedDelay={predictedDelay}
-            stations={stations}
-            setActivePage={setActivePage}
+            selectedTrain={selectedTrain}
+            liveTrainData={liveTrainData}
           />
         );
 
@@ -588,6 +1012,7 @@ function App() {
             etaData={etaData}
             currentDelay={currentDelay}
             setActivePage={setActivePage}
+            selectedTrain={selectedTrain}
           />
         );
 
@@ -606,22 +1031,22 @@ function App() {
   // =========================
   // PAGE TITLES
   // =========================
+
   const pageTitles = {
     home: "Home",
     search: "Search Train",
-    eta: "ETA Prediction",
-    future: "Future Delay",
-    map: "Live Train Map",
     dashboard: "Dashboard",
+    map: "Live Train Map",
     alerts: "Alerts",
   };
 
   const currentPageTitle =
-    pageTitles[activePage];
+    pageTitles[activePage] || "Home";
 
   // =========================
-  // APP
+  // APP UI
   // =========================
+
   return (
     <div className="app">
 
@@ -634,10 +1059,21 @@ function App() {
       <main className="main-content">
 
         <Topbar
-          currentPageTitle={currentPageTitle}
-          setSidebarOpen={setSidebarOpen}
-          sidebarOpen={sidebarOpen}
-          setActivePage={setActivePage}
+          currentPageTitle={
+            currentPageTitle
+          }
+
+          setSidebarOpen={
+            setSidebarOpen
+          }
+
+          sidebarOpen={
+            sidebarOpen
+          }
+
+          setActivePage={
+            setActivePage
+          }
         />
 
         <div className="content-wrapper">
