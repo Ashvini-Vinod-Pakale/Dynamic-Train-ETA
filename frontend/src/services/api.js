@@ -9,21 +9,14 @@ export const checkBackendHealth = async () => {
     `${API_BASE_URL}/health`,
     {
       method: "GET",
-      headers: {
-        Accept: "text/plain, application/json",
-      },
     }
   );
 
   if (!response.ok) {
-    throw new Error(
-      `Backend health check failed: ${response.status}`
-    );
+    throw new Error("Backend is not responding");
   }
 
-  const result = await response.text();
-
-  return result || "Backend Online";
+  return await response.text();
 };
 
 

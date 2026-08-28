@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import "./App.css";
 
@@ -12,6 +12,9 @@ import SearchTrain from "./pages/SearchTrain";
 import Dashboard from "./pages/Dashboard";
 import LiveTrainMap from "./pages/LiveTrainMap";
 import Alerts from "./pages/Alerts";
+
+// API
+import { checkBackendHealth } from "./services/api";
 
 function App() {
   // =========================
@@ -50,8 +53,6 @@ function App() {
 
   // =========================
   // ETA DATA
-  // INTERNAL DATA USED BY
-  // DASHBOARD AND ALERTS
   // =========================
 
   const [etaData, setEtaData] = useState(null);
@@ -61,9 +62,14 @@ function App() {
   const [error, setError] = useState("");
 
   // =========================
+  // BACKEND CONNECTION STATUS
+  // =========================
+
+  const [backendStatus, setBackendStatus] =
+    useState("checking");
+
+  // =========================
   // FUTURE DELAY DATA
-  // INTERNAL DATA USED BY
-  // DASHBOARD AND ALERTS
   // =========================
 
   const [futureDelayData, setFutureDelayData] =
@@ -80,6 +86,43 @@ function App() {
     stationPredictions,
     setStationPredictions,
   ] = useState([]);
+
+  // =========================
+  // BACKEND HEALTH CHECK
+  // =========================
+
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        await checkBackendHealth();
+
+        console.log(
+          "Backend connected successfully"
+        );
+
+        setBackendStatus("online");
+
+      } catch (error) {
+        console.warn(
+          "Backend is offline",
+          error
+        );
+
+        setBackendStatus("offline");
+      }
+    };
+
+    checkBackend();
+
+    const interval = setInterval(
+      checkBackend,
+      10000
+    );
+
+    return () =>
+      clearInterval(interval);
+
+  }, []);
 
   // =========================
   // EASY ACCESS VARIABLES
@@ -217,27 +260,16 @@ function App() {
 
       const demoTrainData = {
         trainNumber,
-
         currentLatitude: 18.785,
-
         currentLongitude: 73.345,
-
         currentSpeed: 64,
-
         currentDelay: 15,
-
         previousDelay: 12,
-
         currentStation: "Khopoli",
-
         nextStation: "Panvel",
-
         weatherFactor: 0,
-
         trafficFactor: 0,
-
-        lastUpdated:
-          new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
       };
 
       setLiveTrainData(demoTrainData);
@@ -309,7 +341,6 @@ function App() {
 
   // =========================
   // ETA PREDICTION
-  // INTERNAL AI FUNCTION
   // =========================
 
   const predictETA = async (
@@ -542,7 +573,6 @@ function App() {
 
   // =========================
   // FUTURE DELAY PREDICTION
-  // INTERNAL AI FUNCTION
   // =========================
 
   const predictFutureDelay =
@@ -951,7 +981,6 @@ function App() {
 
   // =========================
   // PAGE RENDERER
-  // ONLY ACTIVE PAGES
   // =========================
 
   const renderPage = () => {
@@ -991,6 +1020,7 @@ function App() {
               loading ||
               futureDelayLoading
             }
+            backendStatus={backendStatus}
           />
         );
 
@@ -1062,15 +1092,12 @@ function App() {
           currentPageTitle={
             currentPageTitle
           }
-
           setSidebarOpen={
             setSidebarOpen
           }
-
           sidebarOpen={
             sidebarOpen
           }
-
           setActivePage={
             setActivePage
           }
