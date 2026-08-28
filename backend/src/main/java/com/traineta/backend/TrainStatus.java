@@ -1,3 +1,4 @@
+
 package com.traineta.backend;
 
 import jakarta.persistence.*;
@@ -11,28 +12,81 @@ public class TrainStatus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    // =====================================================
+    // TRAIN INFORMATION
+    // =====================================================
+
+    @Column(name = "train_number")
     private String trainNumber;
+
+    @Column(name = "current_location")
     private String currentLocation;
 
-    // GPS Location
+    // =====================================================
+    // GPS LOCATION
+    // =====================================================
+
+    @Column(name = "latitude")
     private Double latitude;
+
+    @Column(name = "longitude")
     private Double longitude;
 
+    // =====================================================
+    // TRAIN STATUS
+    // =====================================================
+
+    @Column(name = "current_speed")
     private Double currentSpeed;
+
+    @Column(name = "current_delay")
     private Double currentDelay;
+
+    @Column(name = "previous_delay")
     private Double previousDelay;
+
+    @Column(name = "weather_factor")
     private Integer weatherFactor;
+
+    @Column(name = "traffic_factor")
     private Integer trafficFactor;
+
+    @Column(name = "next_station")
     private String nextStation;
+
+    // =====================================================
+    // PREDICTION
+    // =====================================================
+
+    @Column(name = "future_delay")
     private Double futureDelay;
+
+    @Column(name = "predicted_eta")
     private String predictedEta;
+
+    @Column(name = "confidence_score")
     private Double confidenceScore;
+
+    @Column(name = "delay_alert")
     private String delayAlert;
 
+    // =====================================================
+    // TIMESTAMP
+    // =====================================================
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    // =====================================================
+    // CONSTRUCTOR
+    // =====================================================
 
     public TrainStatus() {
     }
+
+    // =====================================================
+    // GETTERS AND SETTERS
+    // =====================================================
 
     public Integer getId() {
         return id;

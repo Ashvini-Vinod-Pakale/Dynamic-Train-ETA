@@ -1,3 +1,4 @@
+
 package com.traineta.backend;
 
 import com.traineta.backend.repository.TrainStatusRepository;
@@ -29,14 +30,24 @@ public class ETAController {
     }
 
     @PostMapping("/predict/eta")
-    public ETAResponse predictETA(@RequestBody ETARequest request) {
+    public ETAResponse predictETA(
+            @RequestBody ETARequest request) {
+
+        // ==========================================
+        // 1. BASE TRAVEL TIME
+        // ==========================================
 
         double baseTravelTime = 0.0;
 
         if (request.currentSpeed() > 0) {
             baseTravelTime =
-                    (request.routeDistance() / request.currentSpeed()) * 60.0;
+                    (request.routeDistance()
+                            / request.currentSpeed()) * 60.0;
         }
+
+        // ==========================================
+        // 2. ML FUTURE DELAY PREDICTION
+        // ==========================================
 
         double futureDelay =
                 futureDelayService.predictFutureDelay(
@@ -48,10 +59,18 @@ public class ETAController {
                         request.routeDistance()
                 );
 
+        // ==========================================
+        // 3. DYNAMIC ETA
+        // ==========================================
+
         double dynamicETA =
                 baseTravelTime
                         + request.currentDelay()
                         + futureDelay;
+
+        // ==========================================
+        // 4. PREDICTED ARRIVAL TIME
+        // ==========================================
 
         LocalDateTime predictedArrival =
                 LocalDateTime.now().plusSeconds(
@@ -64,6 +83,10 @@ public class ETAController {
         String predictedArrivalTime =
                 predictedArrival.format(formatter);
 
+        // ==========================================
+        // 5. CONFIDENCE SCORE
+        // ==========================================
+
         double confidence =
                 calculateConfidence(
                         request.currentDelay(),
@@ -73,18 +96,31 @@ public class ETAController {
                         request.trafficFactor()
                 );
 
+        // ==========================================
+        // 6. DELAY ALERT
+        // ==========================================
+
         String delayAlert;
 
         if (futureDelay >= 10.0) {
+
             delayAlert =
                     "Additional "
                             + round(futureDelay)
                             + " min delay predicted";
+
         } else if (futureDelay > 0.0) {
+
             delayAlert = "Minor future delay predicted";
+
         } else {
+
             delayAlert = "No additional delay predicted";
         }
+
+        // ==========================================
+        // 7. TRAIN ROUTE
+        // ==========================================
 
         String[] route = {
                 "Mumbai",
@@ -93,10 +129,31 @@ public class ETAController {
                 "Manmad"
         };
 
+        // ==========================================
+        // 8. GPS DEBUG
+        // ==========================================
+
+        System.out.println("========================================");
+        System.out.println("GPS DATA RECEIVED");
+        System.out.println("Train Number : " + request.trainNumber());
+        System.out.println("Location     : " + request.currentLocation());
+        System.out.println("Latitude     : " + request.latitude());
+        System.out.println("Longitude    : " + request.longitude());
+        System.out.println("========================================");
+
+        // ==========================================
+        // 9. SAVE CURRENT TRAIN STATUS
+        // ==========================================
+
         TrainStatus trainStatus = new TrainStatus();
 
         trainStatus.setTrainNumber(request.trainNumber());
         trainStatus.setCurrentLocation(request.currentLocation());
+
+        // GPS LOCATION
+        trainStatus.setLatitude(request.latitude());
+        trainStatus.setLongitude(request.longitude());
+
         trainStatus.setCurrentSpeed(request.currentSpeed());
         trainStatus.setCurrentDelay(request.currentDelay());
         trainStatus.setPreviousDelay(request.previousDelay());
@@ -110,6 +167,10 @@ public class ETAController {
         trainStatus.setCreatedAt(LocalDateTime.now());
 
         trainStatusRepository.save(trainStatus);
+
+        // ==========================================
+        // 10. SAVE PREDICTION HISTORY
+        // ==========================================
 
         PredictionHistory history = new PredictionHistory();
 
@@ -126,6 +187,10 @@ public class ETAController {
 
         predictionHistoryRepository.save(history);
 
+        // ==========================================
+        // 11. RESPONSE
+        // ==========================================
+
         return new ETAResponse(
                 request.trainNumber(),
                 request.currentLocation(),
@@ -140,6 +205,10 @@ public class ETAController {
                 route
         );
     }
+
+    // ==========================================
+    // CONFIDENCE SCORE
+    // ==========================================
 
     private double calculateConfidence(
             double currentDelay,
@@ -173,13 +242,27 @@ public class ETAController {
         return confidence;
     }
 
+    // ==========================================
+    // ROUND
+    // ==========================================
+
     private double round(double value) {
         return Math.round(value * 100.0) / 100.0;
     }
 
+    // ==========================================
+    // REQUEST
+    // ==========================================
+
     public record ETARequest(
+
             String trainNumber,
             String currentLocation,
+
+            // GPS LOCATION
+            double latitude,
+            double longitude,
+
             double routeDistance,
             double currentSpeed,
             double currentDelay,
@@ -187,9 +270,15 @@ public class ETAController {
             int weatherFactor,
             int trafficFactor,
             String nextStation
+
     ) {}
 
+    // ==========================================
+    // RESPONSE
+    // ==========================================
+
     public record ETAResponse(
+
             String trainNumber,
             String currentLocation,
             double currentSpeed,
@@ -201,5 +290,7 @@ public class ETAController {
             double confidenceScore,
             String delayAlert,
             String[] route
+
     ) {}
 }
+
