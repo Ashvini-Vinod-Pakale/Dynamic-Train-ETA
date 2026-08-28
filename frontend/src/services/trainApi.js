@@ -106,3 +106,24 @@ export const predictFutureDelay = async (
     throw error;
   }
 };
+/* =========================================
+   GET LIVE TRAIN DATA
+========================================= */
+
+export const getLiveTrainData = async (trainNumber) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/train/${trainNumber}/live`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to get live train data");
+    }
+
+    return await response.json();
+
+  } catch (error) {
+    console.error("Live Train API Error:", error);
+    throw error;
+  }
+};

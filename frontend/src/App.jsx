@@ -6,7 +6,7 @@ import "./App.css";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 
-// ACTIVE PAGES ONLY
+// PAGES
 import Home from "./pages/Home";
 import SearchTrain from "./pages/SearchTrain";
 import Dashboard from "./pages/Dashboard";
@@ -21,48 +21,62 @@ function App() {
   // MAIN UI STATES
   // =========================
 
-  const [activePage, setActivePage] = useState("home");
+  const [activePage, setActivePage] =
+    useState("home");
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] =
+    useState(true);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] =
+    useState("");
 
   // =========================
   // SELECTED TRAIN
   // =========================
 
-  const [selectedTrain, setSelectedTrain] = useState(null);
+  const [selectedTrain, setSelectedTrain] =
+    useState(null);
 
   // =========================
-  // LIVE TRAIN / GPS DATA
+  // LIVE TRAIN DATA
   // =========================
 
-  const [liveTrainData, setLiveTrainData] = useState({
-    trainNumber: "12110",
-    currentLatitude: 18.785,
-    currentLongitude: 73.345,
-    currentSpeed: 64,
-    currentDelay: 15,
-    previousDelay: 12,
-    currentStation: "Khopoli",
-    nextStation: "Panvel",
-    weatherFactor: 0,
-    trafficFactor: 0,
-    lastUpdated: new Date().toISOString(),
-  });
+  const [liveTrainData, setLiveTrainData] =
+    useState({
+      trainNumber: "12110",
+      trainName: "Deccan Queen",
+
+      currentLatitude: 18.892,
+      currentLongitude: 73.325,
+
+      currentSpeed: 64,
+      currentDelay: 15,
+      previousDelay: 12,
+
+      currentStation: "Khopoli",
+      nextStation: "Panvel",
+
+      weatherFactor: 0,
+      trafficFactor: 1,
+
+      lastUpdated: new Date().toISOString(),
+    });
 
   // =========================
   // ETA DATA
   // =========================
 
-  const [etaData, setEtaData] = useState(null);
+  const [etaData, setEtaData] =
+    useState(null);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =
+    useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
   // =========================
-  // BACKEND CONNECTION STATUS
+  // BACKEND STATUS
   // =========================
 
   const [backendStatus, setBackendStatus] =
@@ -72,11 +86,15 @@ function App() {
   // FUTURE DELAY DATA
   // =========================
 
-  const [futureDelayData, setFutureDelayData] =
-    useState(null);
+  const [
+    futureDelayData,
+    setFutureDelayData,
+  ] = useState(null);
 
-  const [futureDelayLoading, setFutureDelayLoading] =
-    useState(false);
+  const [
+    futureDelayLoading,
+    setFutureDelayLoading,
+  ] = useState(false);
 
   // =========================
   // STATION-WISE PREDICTIONS
@@ -119,8 +137,7 @@ function App() {
       10000
     );
 
-    return () =>
-      clearInterval(interval);
+    return () => clearInterval(interval);
 
   }, []);
 
@@ -183,7 +200,7 @@ function App() {
     null;
 
   // =========================
-  // FETCH LIVE GPS DATA
+  // FETCH LIVE TRAIN DATA
   // =========================
 
   const fetchLiveTrainData = async (
@@ -200,20 +217,34 @@ function App() {
         );
       }
 
-      const data = await response.json();
+      const data =
+        await response.json();
+
+      console.log(
+        "Live train data:",
+        data
+      );
 
       const freshTrainData = {
         trainNumber:
           data.trainNumber ||
           trainNumber,
 
-        currentLatitude:
-          data.currentLatitude ??
-          18.785,
+        trainName:
+          data.trainName ||
+          "Deccan Queen",
 
+        // Backend returns latitude
+        currentLatitude:
+          data.latitude ??
+          data.currentLatitude ??
+          18.892,
+
+        // Backend returns longitude
         currentLongitude:
+          data.longitude ??
           data.currentLongitude ??
-          73.345,
+          73.325,
 
         currentSpeed:
           data.currentSpeed ??
@@ -241,38 +272,65 @@ function App() {
 
         trafficFactor:
           data.trafficFactor ??
-          0,
+          1,
 
         lastUpdated:
           data.lastUpdated ||
           new Date().toISOString(),
       };
 
-      setLiveTrainData(freshTrainData);
+      setLiveTrainData(
+        freshTrainData
+      );
 
       return freshTrainData;
 
     } catch (error) {
       console.warn(
-        "Live GPS backend unavailable. Using demo GPS data.",
+        "Live train backend unavailable. Using demo data.",
         error
       );
 
       const demoTrainData = {
         trainNumber,
-        currentLatitude: 18.785,
-        currentLongitude: 73.345,
-        currentSpeed: 64,
-        currentDelay: 15,
-        previousDelay: 12,
-        currentStation: "Khopoli",
-        nextStation: "Panvel",
-        weatherFactor: 0,
-        trafficFactor: 0,
-        lastUpdated: new Date().toISOString(),
+
+        trainName:
+          "Deccan Queen",
+
+        currentLatitude:
+          18.892,
+
+        currentLongitude:
+          73.325,
+
+        currentSpeed:
+          64,
+
+        currentDelay:
+          15,
+
+        previousDelay:
+          12,
+
+        currentStation:
+          "Khopoli",
+
+        nextStation:
+          "Panvel",
+
+        weatherFactor:
+          0,
+
+        trafficFactor:
+          1,
+
+        lastUpdated:
+          new Date().toISOString(),
       };
 
-      setLiveTrainData(demoTrainData);
+      setLiveTrainData(
+        demoTrainData
+      );
 
       return demoTrainData;
     }
@@ -414,39 +472,29 @@ function App() {
       const data =
         await response.json();
 
-      const futureDelay =
-        Number(data.futureDelay) || 0;
-
-      const totalDelay =
-        Number(trainData.currentDelay) +
-        futureDelay;
-
-      const predictedETA =
-        calculatePredictedTime(
-          scheduledArrival,
-          totalDelay
-        );
+      console.log(
+        "ETA prediction:",
+        data
+      );
 
       setEtaData({
         ...data,
 
-        scheduledArrival,
+        scheduledArrival:
+          data.scheduledArrival ||
+          scheduledArrival,
 
         currentDelay:
-          Number(
-            trainData.currentDelay
-          ),
-
-        futureDelay:
-          Math.round(futureDelay),
-
-        totalDelay:
-          Math.round(totalDelay),
-
-        predictedETA,
+          data.currentDelay ??
+          trainData.currentDelay,
 
         nextStation:
+          data.nextStation ||
           trainData.nextStation,
+
+        confidenceScore:
+          data.confidenceScore ??
+          91,
       });
 
     } catch (err) {
@@ -670,7 +718,8 @@ function App() {
               simulatedFutureDelay
             ),
 
-          confidenceScore: 92,
+          confidenceScore:
+            92,
         });
 
       } finally {
@@ -939,7 +988,7 @@ function App() {
         train.number
       );
 
-      // CLEAR OLD PREDICTION DATA
+      // CLEAR OLD DATA
 
       setEtaData(null);
 
@@ -953,14 +1002,14 @@ function App() {
         "dashboard"
       );
 
-      // GET FRESH LIVE DATA
+      // GET LIVE TRAIN DATA
 
       const freshTrainData =
         await fetchLiveTrainData(
           train.number
         );
 
-      // RUN ALL PREDICTIONS
+      // RUN PREDICTIONS
 
       await Promise.all([
         predictETA(
@@ -1071,7 +1120,8 @@ function App() {
   };
 
   const currentPageTitle =
-    pageTitles[activePage] || "Home";
+    pageTitles[activePage] ||
+    "Home";
 
   // =========================
   // APP UI
