@@ -3,62 +3,82 @@ package com.traineta.backend;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/api/train")
 @CrossOrigin(origins = "*")
 public class TrainController {
 
+    private final TrainSimulationService simulationService;
+
+    public TrainController(
+            TrainSimulationService simulationService
+    ) {
+        this.simulationService = simulationService;
+    }
+
     @GetMapping("/{trainNumber}/live")
     public LiveTrainResponse getLiveTrainData(
-            @PathVariable String trainNumber) {
+            @PathVariable String trainNumber
+    ) {
 
-        // Simulated live train data
-        String currentStation = "Khopoli";
-        String nextStation = "Panvel";
-
-        double latitude = 18.8920;
-        double longitude = 73.3250;
-
-        double currentSpeed = 64.0;
-        double currentDelay = 15.0;
-        double previousDelay = 12.0;
-
-        int weatherFactor = 0;
-        int trafficFactor = 1;
-
-        String lastUpdated = LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a"));
+        TrainSimulationService.SimulationStatus status =
+                simulationService.getStatus();
 
         return new LiveTrainResponse(
-                trainNumber,
+
+                status.trainNumber(),
+
                 "Deccan Queen",
-                currentStation,
-                nextStation,
-                latitude,
-                longitude,
-                currentSpeed,
-                currentDelay,
-                previousDelay,
-                weatherFactor,
-                trafficFactor,
-                lastUpdated
+
+                status.currentLocation(),
+
+                status.nextStation(),
+
+                status.latitude(),
+
+                status.longitude(),
+
+                status.currentSpeed(),
+
+                status.currentDelay(),
+
+                status.previousDelay(),
+
+                status.weatherFactor(),
+
+                status.trafficFactor(),
+
+                LocalDateTime.now().toString()
         );
     }
 
     public record LiveTrainResponse(
+
             String trainNumber,
+
             String trainName,
+
             String currentStation,
+
             String nextStation,
+
             double latitude,
+
             double longitude,
+
             double currentSpeed,
+
             double currentDelay,
+
             double previousDelay,
+
             int weatherFactor,
+
             int trafficFactor,
+
             String lastUpdated
-    ) {}
+
+    ) {
+    }
 }

@@ -40,7 +40,6 @@ const trainIcon = L.divIcon({
   `,
 
   iconSize: [48, 48],
-
   iconAnchor: [24, 24],
 });
 
@@ -49,19 +48,11 @@ const trainIcon = L.divIcon({
 ========================================= */
 
 const stationPositions = {
-  "Pune Jn": [18.5286, 73.8743],
+  Igatpuri: [19.6950, 73.5620],
 
-  "Pune Junction": [18.5286, 73.8743],
+  "Nashik Road": [19.9975, 73.7898],
 
-  Lonavala: [18.7546, 73.4062],
-
-  Khopoli: [18.785, 73.345],
-
-  Panvel: [18.9894, 73.1175],
-
-  Dadar: [19.0178, 72.8478],
-
-  "Mumbai CST": [18.9402, 72.8356],
+  Manmad: [20.2530, 74.4380],
 };
 
 /* =========================================
@@ -133,6 +124,7 @@ function LiveTrainMap({
   selectedTrain,
   liveTrainData,
 }) {
+
   /* =========================================
      SELECTED TRAIN DATA
   ========================================= */
@@ -140,48 +132,33 @@ function LiveTrainMap({
   const trainNumber =
     selectedTrain?.number ||
     liveTrainData?.trainNumber ||
-    "12110";
+    "12123";
 
   const trainName =
     selectedTrain?.name ||
-    "Deccan Queen";
+    liveTrainData?.trainName ||
+    "Dynamic Train";
 
   const trainRoute =
     selectedTrain?.route ||
-    "Pune → Mumbai CST";
+    "Igatpuri → Nashik Road → Manmad";
 
   /* =========================================
-     INITIAL LIVE POSITION
+     LIVE POSITION
   ========================================= */
 
   const initialPosition = [
-    liveTrainData?.currentLatitude ?? 18.785,
-    liveTrainData?.currentLongitude ?? 73.345,
+    liveTrainData?.currentLatitude ?? 19.9975,
+    liveTrainData?.currentLongitude ?? 73.7898,
   ];
 
   const [livePosition, setLivePosition] =
     useState(initialPosition);
 
-  /*
-    Simulation starts at Khopoli.
-
-    0 = Pune Jn
-    1 = Lonavala
-    2 = Khopoli
-    3 = Panvel
-    4 = Dadar
-    5 = Mumbai CST
-  */
-
-  const [
-    simulationStationIndex,
-    setSimulationStationIndex,
-  ] = useState(2);
-
   const [lastUpdated, setLastUpdated] =
     useState(
       liveTrainData?.lastUpdated ||
-        new Date().toISOString()
+      new Date().toISOString()
     );
 
   /* =========================================
@@ -189,20 +166,23 @@ function LiveTrainMap({
   ========================================= */
 
   useEffect(() => {
+
     if (
       liveTrainData?.currentLatitude !== undefined &&
       liveTrainData?.currentLongitude !== undefined
     ) {
+
       setLivePosition([
-        liveTrainData.currentLatitude,
-        liveTrainData.currentLongitude,
+        Number(liveTrainData.currentLatitude),
+        Number(liveTrainData.currentLongitude),
       ]);
 
       setLastUpdated(
         liveTrainData.lastUpdated ||
-          new Date().toISOString()
+        new Date().toISOString()
       );
     }
+
   }, [
     liveTrainData?.currentLatitude,
     liveTrainData?.currentLongitude,
@@ -214,72 +194,89 @@ function LiveTrainMap({
   ========================================= */
 
   const baseStations = useMemo(() => {
+
     if (stations.length > 0) {
+
       return stations.map((station) => ({
         ...station,
 
         position:
           stationPositions[station.name] ||
-          [18.85, 73.2],
+          [19.9975, 73.7898],
       }));
     }
 
     return [
+
       {
-        name: "Pune Jn",
+        name: "Igatpuri",
         time: "08:00",
         delay: "On Time",
-        position: stationPositions["Pune Jn"],
+        position: stationPositions.Igatpuri,
       },
 
       {
-        name: "Lonavala",
-        time: "08:43",
-        delay: "+5 min",
-        position: stationPositions.Lonavala,
-      },
-
-      {
-        name: "Khopoli",
+        name: "Nashik Road",
         time: "09:25",
-        delay: "+15 min",
-        position: stationPositions.Khopoli,
-      },
 
-      {
-        name: "Panvel",
-        time: "10:10",
-        delay: "+18 min",
-        position: stationPositions.Panvel,
-      },
+        delay:
+          liveTrainData?.currentDelay !== undefined
+            ? `+${Number(
+                liveTrainData.currentDelay
+              ).toFixed(1)} min`
+            : "+18 min",
 
-      {
-        name: "Dadar",
-        time: "10:58",
-        delay: "+21 min",
-        position: stationPositions.Dadar,
-      },
-
-      {
-        name: "Mumbai CST",
-        time: "11:38",
-        delay: "+21 min",
         position:
-          stationPositions["Mumbai CST"],
+          stationPositions["Nashik Road"],
       },
+
+      {
+        name: "Manmad",
+        time: "10:30",
+
+        delay:
+          liveTrainData?.futureDelay !== undefined
+            ? `+${Number(
+                liveTrainData.futureDelay
+              ).toFixed(1)} min predicted`
+            : "Upcoming",
+
+        position:
+          stationPositions.Manmad,
+      },
+
     ];
-  }, [stations]);
+
+  }, [
+    stations,
+    liveTrainData?.currentDelay,
+    liveTrainData?.futureDelay,
+  ]);
+
+  /* =========================================
+     CURRENT STATION INDEX
+  ========================================= */
+
+  const simulationStationIndex =
+    Math.max(
+      0,
+
+      baseStations.findIndex(
+        (station) =>
+          station.name ===
+          liveTrainData?.currentStation
+      )
+    );
 
   /* =========================================
      LIVE STATION STATUS
-
-     Automatically changes station status
-     according to simulation position.
   ========================================= */
 
   const trainStations = useMemo(() => {
+
     return baseStations.map(
       (station, index) => ({
+
         ...station,
 
         status:
@@ -288,8 +285,10 @@ function LiveTrainMap({
             : index === simulationStationIndex
             ? "current"
             : "upcoming",
+
       })
     );
+
   }, [
     baseStations,
     simulationStationIndex,
@@ -319,36 +318,47 @@ function LiveTrainMap({
   ========================================= */
 
   const nextStation =
+    trainStations.find(
+      (station) =>
+        station.name ===
+        liveTrainData?.nextStation
+    ) ||
     trainStations[
       simulationStationIndex + 1
-    ] || null;
+    ] ||
+    null;
 
   /* =========================================
      COMPLETED ROUTE
   ========================================= */
 
   const completedRoute = [
+
     ...routePositions.slice(
       0,
       simulationStationIndex + 1
     ),
 
     livePosition,
+
   ];
 
   /* =========================================
      REMAINING ROUTE
   ========================================= */
 
-  const remainingRoute = nextStation
-    ? [
-        livePosition,
+  const remainingRoute =
+    nextStation
+      ? [
 
-        ...routePositions.slice(
-          simulationStationIndex + 1
-        ),
-      ]
-    : [];
+          livePosition,
+
+          ...routePositions.slice(
+            simulationStationIndex + 1
+          ),
+
+        ]
+      : [];
 
   /* =========================================
      JOURNEY PROGRESS
@@ -385,8 +395,19 @@ function LiveTrainMap({
   const activeSpeed =
     Number(
       currentSpeed ??
-        liveTrainData?.currentSpeed ??
-        64
+      liveTrainData?.currentSpeed ??
+      68
+    );
+
+  /* =========================================
+     ACTIVE DELAY
+  ========================================= */
+
+  const activeDelay =
+    Number(
+      currentDelay ??
+      liveTrainData?.currentDelay ??
+      0
     );
 
   /* =========================================
@@ -397,6 +418,7 @@ function LiveTrainMap({
     nextStation && activeSpeed > 0
       ? Math.max(
           1,
+
           Math.round(
             (distanceToNext /
               activeSpeed) *
@@ -404,98 +426,6 @@ function LiveTrainMap({
           )
         )
       : 0;
-
-  /* =========================================
-     LIVE TRAIN SIMULATION
-
-     Train moves toward the next station.
-
-     When it reaches the station:
-     - Previous becomes completed
-     - Next becomes current
-     - Simulation continues
-  ========================================= */
-
-  useEffect(() => {
-    if (!nextStation?.position) return;
-
-    const interval = setInterval(() => {
-      setLivePosition((previousPosition) => {
-        const target =
-          nextStation.position;
-
-        const latitudeDifference =
-          target[0] -
-          previousPosition[0];
-
-        const longitudeDifference =
-          target[1] -
-          previousPosition[1];
-
-        /*
-          Check whether train has reached
-          the next station.
-        */
-
-        const closeToStation =
-          Math.abs(
-            latitudeDifference
-          ) < 0.001 &&
-          Math.abs(
-            longitudeDifference
-          ) < 0.001;
-
-        if (closeToStation) {
-          /*
-            Move exactly to station.
-          */
-
-          setSimulationStationIndex(
-            (previousIndex) =>
-              Math.min(
-                previousIndex + 1,
-                trainStations.length - 1
-              )
-          );
-
-          setLastUpdated(
-            new Date().toISOString()
-          );
-
-          return target;
-        }
-
-        /*
-          Move train toward target station.
-        */
-
-        const movementSpeed =
-          0.03;
-
-        const newPosition = [
-          previousPosition[0] +
-            latitudeDifference *
-              movementSpeed,
-
-          previousPosition[1] +
-            longitudeDifference *
-              movementSpeed,
-        ];
-
-        setLastUpdated(
-          new Date().toISOString()
-        );
-
-        return newPosition;
-      });
-    }, 2000);
-
-    return () =>
-      clearInterval(interval);
-  }, [
-    nextStation?.name,
-    trainStations.length,
-  ]);
 
   /* =========================================
      FORMAT LAST UPDATED
@@ -511,11 +441,11 @@ function LiveTrainMap({
     });
 
   return (
+
     <div className="page-animation page-container">
 
-      {/* PAGE HEADING */}
-
       <div className="page-heading">
+
         <span>
           LIVE TRAIN TRACKING
         </span>
@@ -529,6 +459,7 @@ function LiveTrainMap({
           journey progress of the train in
           real time.
         </p>
+
       </div>
 
       {/* TRAIN STATUS */}
@@ -536,11 +467,13 @@ function LiveTrainMap({
       <div className="live-map-status-grid">
 
         <div className="live-train-info-card">
+
           <div className="live-train-icon">
             <Train size={28} />
           </div>
 
           <div>
+
             <span>
               SELECTED TRAIN
             </span>
@@ -552,54 +485,65 @@ function LiveTrainMap({
             <p>
               {trainRoute}
             </p>
+
           </div>
+
         </div>
 
         <div className="live-stat-card">
+
           <MapPin size={22} />
 
           <div>
+
             <span>
               CURRENT LOCATION
             </span>
 
             <strong>
-              {currentStation?.name ||
-                "Khopoli"}
+              {liveTrainData?.currentStation ||
+                currentStation?.name ||
+                "Nashik Road"}
             </strong>
+
           </div>
+
         </div>
 
         <div className="live-stat-card">
+
           <Gauge size={22} />
 
           <div>
+
             <span>
               CURRENT SPEED
             </span>
 
             <strong>
-              {activeSpeed} km/h
+              {activeSpeed.toFixed(1)} km/h
             </strong>
+
           </div>
+
         </div>
 
         <div className="live-stat-card">
+
           <Clock3 size={22} />
 
           <div>
+
             <span>
               CURRENT DELAY
             </span>
 
             <strong>
-              +
-              {currentDelay ??
-                liveTrainData?.currentDelay ??
-                15}{" "}
-              min
+              +{activeDelay.toFixed(1)} min
             </strong>
+
           </div>
+
         </div>
 
       </div>
@@ -609,7 +553,9 @@ function LiveTrainMap({
       <div className="map-progress-card">
 
         <div className="map-progress-header">
+
           <div>
+
             <span>
               JOURNEY PROGRESS
             </span>
@@ -617,28 +563,34 @@ function LiveTrainMap({
             <h2>
               {journeyProgress}% Complete
             </h2>
+
           </div>
 
           <Route size={24} />
+
         </div>
 
         <div className="map-progress-bar">
+
           <div
             className="map-progress-fill"
             style={{
               width: `${journeyProgress}%`,
             }}
           />
+
         </div>
 
         <div className="map-progress-labels">
+
           <span>
             {trainStations[0]?.name}
           </span>
 
           <span>
             Current:{" "}
-            {currentStation?.name}
+            {liveTrainData?.currentStation ||
+              currentStation?.name}
           </span>
 
           <span>
@@ -648,6 +600,7 @@ function LiveTrainMap({
               ]?.name
             }
           </span>
+
         </div>
 
       </div>
@@ -656,11 +609,10 @@ function LiveTrainMap({
 
       <div className="live-map-content">
 
-        {/* LEFT JOURNEY */}
-
         <div className="vertical-journey-card">
 
           <div className="vertical-journey-header">
+
             <span>
               JOURNEY PROGRESS
             </span>
@@ -668,6 +620,7 @@ function LiveTrainMap({
             <h2>
               {trainRoute}
             </h2>
+
           </div>
 
           <div className="vertical-stations">
@@ -699,8 +652,7 @@ function LiveTrainMap({
                     </div>
 
                     {index <
-                      trainStations.length -
-                        1 && (
+                      trainStations.length - 1 && (
 
                       <div
                         className={`vertical-line ${
@@ -767,26 +719,30 @@ function LiveTrainMap({
           </div>
 
           <div className="journey-live-status">
+
             <span></span>
 
             TRAIN IS LIVE
+
           </div>
 
         </div>
 
-        {/* REAL MAP */}
+        {/* MAP */}
 
         <div className="live-map-wrapper">
 
           <div className="map-live-label">
+
             <span></span>
 
             LIVE TRACKING
+
           </div>
 
           <MapContainer
             center={livePosition}
-            zoom={10}
+            zoom={9}
             scrollWheelZoom={true}
             className="real-train-map"
           >
@@ -800,9 +756,8 @@ function LiveTrainMap({
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            {/* COMPLETED ROUTE */}
-
             {completedRoute.length > 1 && (
+
               <Polyline
                 positions={completedRoute}
                 pathOptions={{
@@ -811,11 +766,11 @@ function LiveTrainMap({
                   opacity: 0.9,
                 }}
               />
+
             )}
 
-            {/* REMAINING ROUTE */}
-
             {remainingRoute.length > 1 && (
+
               <Polyline
                 positions={remainingRoute}
                 pathOptions={{
@@ -825,9 +780,8 @@ function LiveTrainMap({
                   dashArray: "10 10",
                 }}
               />
-            )}
 
-            {/* STATION MARKERS */}
+            )}
 
             {trainStations.map(
               (station) => (
@@ -836,8 +790,7 @@ function LiveTrainMap({
                   key={station.name}
                   center={station.position}
                   radius={
-                    station.status ===
-                    "current"
+                    station.status === "current"
                       ? 10
                       : 7
                   }
@@ -854,7 +807,6 @@ function LiveTrainMap({
                         : "#94a3b8",
 
                     fillOpacity: 1,
-
                     weight: 3,
                   }}
                 >
@@ -882,8 +834,6 @@ function LiveTrainMap({
               )
             )}
 
-            {/* LIVE TRAIN */}
-
             <Marker
               position={livePosition}
               icon={trainIcon}
@@ -898,12 +848,13 @@ function LiveTrainMap({
                 <br />
 
                 Current location:{" "}
-                {currentStation?.name}
+                {liveTrainData?.currentStation ||
+                  currentStation?.name}
 
                 <br />
 
                 Speed:{" "}
-                {activeSpeed} km/h
+                {activeSpeed.toFixed(1)} km/h
 
               </Popup>
 
@@ -911,15 +862,15 @@ function LiveTrainMap({
 
           </MapContainer>
 
-          {/* LAST UPDATED */}
-
           <div className="map-update-info">
+
             <Radio size={14} />
 
             <span>
               Last updated:{" "}
               {formattedLastUpdated}
             </span>
+
           </div>
 
         </div>
@@ -930,20 +881,21 @@ function LiveTrainMap({
 
       <div className="live-map-bottom-grid">
 
-        {/* NEXT STATION */}
-
         <div className="map-info-panel">
+
           <div className="map-panel-icon">
             <Navigation size={23} />
           </div>
 
           <div>
+
             <span>
               NEXT STATION
             </span>
 
             <h3>
-              {nextStation?.name ||
+              {liveTrainData?.nextStation ||
+                nextStation?.name ||
                 "Journey Complete"}
             </h3>
 
@@ -952,17 +904,19 @@ function LiveTrainMap({
                 ? `Scheduled arrival: ${nextStation.time}`
                 : "Train has reached destination"}
             </p>
+
           </div>
+
         </div>
 
-        {/* DISTANCE */}
-
         <div className="map-info-panel">
+
           <div className="map-panel-icon purple-panel-icon">
             <Activity size={23} />
           </div>
 
           <div>
+
             <span>
               DISTANCE TO NEXT STATION
             </span>
@@ -978,33 +932,42 @@ function LiveTrainMap({
                 ? `Estimated arrival in ${minutesToNext} minutes`
                 : "Journey completed"}
             </p>
+
           </div>
+
         </div>
 
-        {/* JOURNEY STATUS */}
-
         <div className="map-info-panel">
+
           <div className="map-panel-icon purple-panel-icon">
             <Train size={23} />
           </div>
 
           <div>
+
             <span>
               JOURNEY STATUS
             </span>
 
             <h3>
-              {nextStation
+              {liveTrainData?.running === false
+                ? "Simulation Stopped"
+                : nextStation
                 ? "On The Way"
                 : "Journey Completed"}
             </h3>
 
             <p>
               {nextStation
-                ? `Currently travelling towards ${nextStation.name}`
-                : "Train has reached Mumbai CST"}
+                ? `Currently travelling towards ${
+                    liveTrainData?.nextStation ||
+                    nextStation.name
+                  }`
+                : "Train has reached destination"}
             </p>
+
           </div>
+
         </div>
 
       </div>

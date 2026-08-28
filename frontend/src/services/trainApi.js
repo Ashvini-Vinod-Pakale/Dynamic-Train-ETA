@@ -127,3 +127,52 @@ export const getLiveTrainData = async (trainNumber) => {
     throw error;
   }
 };
+/* =========================================
+   TRAIN SIMULATION
+========================================= */
+
+export const startTrainSimulation = async () => {
+  const response = await fetch(
+    "http://localhost:8080/api/simulation/start",
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to start train simulation");
+  }
+
+  return await response.text();
+};
+
+
+export const stopTrainSimulation = async () => {
+  const response = await fetch(
+    "http://localhost:8080/api/simulation/stop",
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to stop train simulation");
+  }
+
+  return await response.text();
+};
+
+
+export const getSimulationStatus = async () => {
+  const response = await fetch(
+    "http://localhost:8080/api/simulation/status"
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to get live simulation status"
+    );
+  }
+
+  return await response.json();
+};

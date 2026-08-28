@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { checkBackendHealth } from "../services/api";
 
 import {
+  getSimulationStatus,
+} from "../services/trainApi";
+
+import {
   Train,
   Check,
   Circle,
@@ -45,6 +49,16 @@ function Dashboard({
 
 
   /* =========================================
+     LIVE TRAIN SIMULATION STATE
+  ========================================= */
+
+  const [
+    liveTrainData,
+    setLiveTrainData,
+  ] = useState(null);
+
+
+  /* =========================================
      BACKEND STATUS
   ========================================= */
 
@@ -81,14 +95,61 @@ function Dashboard({
 
 
   /* =========================================
+     GET LIVE TRAIN SIMULATION DATA
+  ========================================= */
+
+  useEffect(() => {
+
+    const fetchLiveTrainData = async () => {
+
+      try {
+
+        const data =
+          await getSimulationStatus();
+
+        setLiveTrainData(data);
+
+        console.log(
+          "Live Train Data:",
+          data
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Live Simulation Error:",
+          error
+        );
+
+      }
+
+    };
+
+    fetchLiveTrainData();
+
+    const interval = setInterval(
+      fetchLiveTrainData,
+      5000
+    );
+
+    return () =>
+      clearInterval(interval);
+
+  }, []);
+
+
+  /* =========================================
      SELECTED TRAIN DATA
   ========================================= */
 
   const trainNumber =
-    selectedTrain?.number || "12110";
+    liveTrainData?.trainNumber ||
+    selectedTrain?.number ||
+    "12110";
 
   const trainName =
-    selectedTrain?.name || "Deccan Queen";
+    selectedTrain?.name ||
+    "Deccan Queen";
 
   const trainRoute =
     selectedTrain?.route ||
@@ -96,22 +157,42 @@ function Dashboard({
 
 
   /* =========================================
-     DEFAULT VALUES
+     LIVE / DEFAULT VALUES
   ========================================= */
 
   const predictedETA =
-    etaData?.predictedETA || "11:56 AM";
+    liveTrainData?.predictedETA ||
+    etaData?.predictedETA ||
+    "11:56 AM";
+
 
   const scheduledArrival =
-    etaData?.scheduledArrival || "11:38 AM";
+    etaData?.scheduledArrival ||
+    "11:38 AM";
+
 
   const totalDelay =
+    liveTrainData?.currentDelay ??
     etaData?.totalDelay ??
     predictedDelay ??
     18;
 
+
   const confidenceScore =
-    etaData?.confidenceScore || 91;
+    liveTrainData?.confidenceScore ??
+    etaData?.confidenceScore ??
+    91;
+
+
+  const currentSpeed =
+    liveTrainData?.currentSpeed ??
+    70;
+
+
+  const futureDelay =
+    liveTrainData?.futureDelay ??
+    predictedDelay ??
+    3;
 
 
   /* =========================================
@@ -172,9 +253,9 @@ function Dashboard({
       predicted: 70,
     },
     {
-      time: "11:30",
-      actual: 69,
-      predicted: 68,
+      time: "Live",
+      actual: Number(currentSpeed.toFixed(2)),
+      predicted: Number(currentSpeed.toFixed(2)),
     },
   ];
 
@@ -213,8 +294,8 @@ function Dashboard({
       delay: 15,
     },
     {
-      time: "11:30",
-      delay: totalDelay,
+      time: "Live",
+      delay: Number(totalDelay.toFixed(2)),
     },
   ];
 
@@ -261,8 +342,6 @@ function Dashboard({
           Real-time route progress, AI prediction,
           train speed and delay analysis.
         </p>
-
-        {/* TEMPORARY BACKEND CONNECTION TEST */}
 
         <p
           style={{
@@ -495,7 +574,7 @@ function Dashboard({
               className={`delay-value ${getDelayColor()}`}
             >
 
-              +{totalDelay} min
+              +{Number(totalDelay).toFixed(2)} min
 
             </strong>
 
@@ -514,7 +593,7 @@ function Dashboard({
 
               <strong>
 
-                {confidenceScore}%
+                {Number(confidenceScore).toFixed(2)}%
 
               </strong>
 
@@ -564,7 +643,7 @@ function Dashboard({
                 <Train size={13} />
 
                 <span>
-                  Current Train Speed
+                  Current Speed: {Number(currentSpeed).toFixed(2)} km/h
                 </span>
 
               </div>
@@ -1063,7 +1142,9 @@ function Dashboard({
 
                   <strong>
 
-                    {currentStation?.name || "Khopoli"}
+                    {liveTrainData?.currentLocation ||
+                      currentStation?.name ||
+                      "Khopoli"}
 
                   </strong>
 
@@ -1084,7 +1165,8 @@ function Dashboard({
 
                   <strong>
 
-                    {etaData?.nextStation ||
+                    {liveTrainData?.nextStation ||
+                      etaData?.nextStation ||
                       nextStation?.name ||
                       "Panvel"}
 
@@ -1107,7 +1189,11 @@ function Dashboard({
 
                   <strong>
 
-                    +{etaData?.currentDelay ?? 15} min
+                    +{Number(
+                      liveTrainData?.currentDelay ??
+                      etaData?.currentDelay ??
+                      15
+                    ).toFixed(2)} min
 
                   </strong>
 
@@ -1128,7 +1214,7 @@ function Dashboard({
 
                   <strong>
 
-                    +{predictedDelay ?? 3} min
+                    +{Number(futureDelay).toFixed(2)} min
 
                   </strong>
 
@@ -1149,7 +1235,7 @@ function Dashboard({
 
                   <strong>
 
-                    {confidenceScore}%
+                    {Number(confidenceScore).toFixed(2)}%
 
                   </strong>
 
@@ -1187,11 +1273,28 @@ function Dashboard({
 
                 Expected total delay:
                 {" "}
-                +{totalDelay} min
+                +{Number(totalDelay).toFixed(2)} min
 
               </div>
 
             </div>
+
+
+            {liveTrainData?.delayAlert && (
+
+              <p
+                style={{
+                  textAlign: "center",
+                  marginTop: "15px",
+                  fontWeight: "600",
+                }}
+              >
+
+                {liveTrainData.delayAlert}
+
+              </p>
+
+            )}
 
 
             <button

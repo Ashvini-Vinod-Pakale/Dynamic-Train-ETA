@@ -17,6 +17,7 @@ import Alerts from "./pages/Alerts";
 import { checkBackendHealth } from "./services/api";
 
 function App() {
+
   // =========================
   // MAIN UI STATES
   // =========================
@@ -110,8 +111,11 @@ function App() {
   // =========================
 
   useEffect(() => {
+
     const checkBackend = async () => {
+
       try {
+
         await checkBackendHealth();
 
         console.log(
@@ -121,6 +125,7 @@ function App() {
         setBackendStatus("online");
 
       } catch (error) {
+
         console.warn(
           "Backend is offline",
           error
@@ -137,7 +142,139 @@ function App() {
       10000
     );
 
-    return () => clearInterval(interval);
+    return () =>
+      clearInterval(interval);
+
+  }, []);
+
+  // =========================
+  // LIVE SIMULATION UPDATES
+  // =========================
+
+  useEffect(() => {
+
+    const fetchSimulationData = async () => {
+
+      try {
+
+        const response = await fetch(
+          "http://localhost:8080/api/simulation/status"
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "Simulation backend error"
+          );
+        }
+
+        const data =
+          await response.json();
+
+        console.log(
+          "Live simulation update:",
+          data
+        );
+
+        setLiveTrainData({
+
+          trainNumber:
+            data.trainNumber ||
+            "12110",
+
+          trainName:
+            "Deccan Queen",
+
+          currentLatitude:
+            data.latitude ??
+            18.892,
+
+          currentLongitude:
+            data.longitude ??
+            73.325,
+
+          currentSpeed:
+            data.currentSpeed ??
+            64,
+
+          currentDelay:
+            data.currentDelay ??
+            15,
+
+          previousDelay:
+            data.previousDelay ??
+            12,
+
+          currentStation:
+            data.currentLocation ||
+            "Khopoli",
+
+          nextStation:
+            data.nextStation ||
+            "Panvel",
+
+          weatherFactor:
+            data.weatherFactor ??
+            0,
+
+          trafficFactor:
+            data.trafficFactor ??
+            0,
+
+          lastUpdated:
+            new Date().toISOString(),
+
+        });
+        // ADD THIS BELOW setLiveTrainData
+
+        setFutureDelayData({
+          predictedFutureDelay:
+            data.futureDelay ?? 0,
+
+          confidenceScore:
+            data.confidenceScore ?? 0,
+        });
+
+        setEtaData((previousData) => ({
+          ...previousData,
+
+          scheduledArrival:
+            previousData?.scheduledArrival ||
+            "11:38 AM",
+
+          currentDelay:
+            data.currentDelay ?? 0,
+
+          futureDelay:
+            data.futureDelay ?? 0,
+
+          predictedETA:
+            data.predictedETA ||
+            previousData?.predictedETA ||
+            "",
+
+          confidenceScore:
+            data.confidenceScore ?? 0,
+        }));
+
+      } catch (error) {
+
+        console.warn(
+          "Unable to fetch live simulation:",
+          error
+        );
+
+      }
+    };
+
+    fetchSimulationData();
+
+    const interval = setInterval(
+      fetchSimulationData,
+      10000
+    );
+
+    return () =>
+      clearInterval(interval);
 
   }, []);
 
@@ -206,12 +343,15 @@ function App() {
   const fetchLiveTrainData = async (
     trainNumber = "12110"
   ) => {
+
     try {
+
       const response = await fetch(
-        `http://localhost:8080/api/train/${trainNumber}/live`
+        "http://localhost:8080/api/simulation/status"
       );
 
       if (!response.ok) {
+
         throw new Error(
           `HTTP error! status: ${response.status}`
         );
@@ -220,30 +360,21 @@ function App() {
       const data =
         await response.json();
 
-      console.log(
-        "Live train data:",
-        data
-      );
-
       const freshTrainData = {
+
         trainNumber:
           data.trainNumber ||
           trainNumber,
 
         trainName:
-          data.trainName ||
           "Deccan Queen",
 
-        // Backend returns latitude
         currentLatitude:
           data.latitude ??
-          data.currentLatitude ??
           18.892,
 
-        // Backend returns longitude
         currentLongitude:
           data.longitude ??
-          data.currentLongitude ??
           73.325,
 
         currentSpeed:
@@ -259,7 +390,7 @@ function App() {
           12,
 
         currentStation:
-          data.currentStation ||
+          data.currentLocation ||
           "Khopoli",
 
         nextStation:
@@ -272,10 +403,9 @@ function App() {
 
         trafficFactor:
           data.trafficFactor ??
-          1,
+          0,
 
         lastUpdated:
-          data.lastUpdated ||
           new Date().toISOString(),
       };
 
@@ -286,53 +416,13 @@ function App() {
       return freshTrainData;
 
     } catch (error) {
+
       console.warn(
-        "Live train backend unavailable. Using demo data.",
+        "Simulation backend unavailable",
         error
       );
 
-      const demoTrainData = {
-        trainNumber,
-
-        trainName:
-          "Deccan Queen",
-
-        currentLatitude:
-          18.892,
-
-        currentLongitude:
-          73.325,
-
-        currentSpeed:
-          64,
-
-        currentDelay:
-          15,
-
-        previousDelay:
-          12,
-
-        currentStation:
-          "Khopoli",
-
-        nextStation:
-          "Panvel",
-
-        weatherFactor:
-          0,
-
-        trafficFactor:
-          1,
-
-        lastUpdated:
-          new Date().toISOString(),
-      };
-
-      setLiveTrainData(
-        demoTrainData
-      );
-
-      return demoTrainData;
+      return liveTrainData;
     }
   };
 
@@ -344,6 +434,7 @@ function App() {
     scheduledArrival,
     totalDelay
   ) => {
+
     const [time, period] =
       scheduledArrival.split(" ");
 
@@ -405,6 +496,7 @@ function App() {
     trainNumber = "12110",
     trainData = liveTrainData
   ) => {
+
     setLoading(true);
 
     setError("");
@@ -413,6 +505,7 @@ function App() {
       "11:38 AM";
 
     try {
+
       const response =
         await fetch(
           "http://localhost:8080/api/predict/eta",
@@ -425,6 +518,7 @@ function App() {
             },
 
             body: JSON.stringify({
+
               trainNumber,
 
               currentLocation:
@@ -472,12 +566,8 @@ function App() {
       const data =
         await response.json();
 
-      console.log(
-        "ETA prediction:",
-        data
-      );
-
       setEtaData({
+
         ...data,
 
         scheduledArrival:
@@ -498,10 +588,6 @@ function App() {
       });
 
     } catch (err) {
-      console.warn(
-        "ETA backend unavailable. Using frontend simulation.",
-        err
-      );
 
       const simulatedFutureDelay =
         Math.max(
@@ -545,41 +631,8 @@ function App() {
           totalDelay
         );
 
-      const confidenceScore =
-        Math.round(
-          Math.max(
-            50,
-
-            Math.min(
-              99,
-
-              95 -
-
-                Math.abs(
-                  Number(
-                    trainData.currentDelay
-                  ) -
-
-                  Number(
-                    trainData.previousDelay
-                  )
-                ) *
-                  1.5 -
-
-                Number(
-                  trainData.weatherFactor
-                ) *
-                  5 -
-
-                Number(
-                  trainData.trafficFactor
-                ) *
-                  4
-            )
-          )
-        );
-
       setEtaData({
+
         scheduledArrival,
 
         currentDelay:
@@ -611,10 +664,12 @@ function App() {
             ) * 60
           ),
 
-        confidenceScore,
+        confidenceScore:
+          92,
       });
 
     } finally {
+
       setLoading(false);
     }
   };
@@ -627,9 +682,11 @@ function App() {
     async (
       trainData = liveTrainData
     ) => {
+
       setFutureDelayLoading(true);
 
       try {
+
         const response =
           await fetch(
             "http://localhost:8080/api/predict/future-delay",
@@ -642,6 +699,7 @@ function App() {
               },
 
               body: JSON.stringify({
+
                 currentSpeed:
                   Number(
                     trainData.currentSpeed
@@ -682,10 +740,6 @@ function App() {
         setFutureDelayData(data);
 
       } catch (err) {
-        console.warn(
-          "Future delay backend unavailable. Using frontend simulation.",
-          err
-        );
 
         const simulatedFutureDelay =
           Math.max(
@@ -713,6 +767,7 @@ function App() {
           );
 
         setFutureDelayData({
+
           predictedFutureDelay:
             Math.round(
               simulatedFutureDelay
@@ -723,6 +778,7 @@ function App() {
         });
 
       } finally {
+
         setFutureDelayLoading(false);
       }
     };
@@ -736,7 +792,9 @@ function App() {
       trainNumber = "12110",
       trainData = liveTrainData
     ) => {
+
       try {
+
         const response =
           await fetch(
             "http://localhost:8080/api/predict/station-wise",
@@ -749,6 +807,7 @@ function App() {
               },
 
               body: JSON.stringify({
+
                 trainNumber,
 
                 currentLocation:
@@ -798,36 +857,27 @@ function App() {
           Array.isArray(predictions) &&
           predictions.length > 0
         ) {
+
           setStationPredictions(
             predictions
           );
+
         } else {
+
           throw new Error(
             "No station predictions received"
           );
         }
 
       } catch (err) {
-        console.warn(
-          "Station-wise backend unavailable. Using frontend simulation.",
-          err
-        );
 
         const currentTrainDelay =
           Number(
             trainData.currentDelay
           );
 
-        const panvelDelay =
-          currentTrainDelay + 3;
-
-        const dadarDelay =
-          currentTrainDelay + 6;
-
-        const mumbaiDelay =
-          currentTrainDelay + 6;
-
         const simulatedPredictions = [
+
           {
             station:
               trainData.nextStation ||
@@ -838,32 +888,31 @@ function App() {
 
             predictedDelay:
               Math.round(
-                panvelDelay
+                currentTrainDelay + 3
               ),
 
             predictedETA:
               calculatePredictedTime(
                 "10:10 AM",
-                panvelDelay
+                currentTrainDelay + 3
               ),
           },
 
           {
-            station:
-              "Dadar",
+            station: "Dadar",
 
             scheduledTime:
               "10:58 AM",
 
             predictedDelay:
               Math.round(
-                dadarDelay
+                currentTrainDelay + 6
               ),
 
             predictedETA:
               calculatePredictedTime(
                 "10:58 AM",
-                dadarDelay
+                currentTrainDelay + 6
               ),
           },
 
@@ -876,13 +925,13 @@ function App() {
 
             predictedDelay:
               Math.round(
-                mumbaiDelay
+                currentTrainDelay + 6
               ),
 
             predictedETA:
               calculatePredictedTime(
                 "11:38 AM",
-                mumbaiDelay
+                currentTrainDelay + 6
               ),
           },
         ];
@@ -898,6 +947,7 @@ function App() {
   // =========================
 
   const stations = [
+
     {
       name: "Pune Jn",
       time: "08:00",
@@ -968,8 +1018,8 @@ function App() {
           ? `+${stationPredictions[2].predictedDelay} min`
           : etaData?.totalDelay !== undefined
             ? `+${Math.round(
-                etaData.totalDelay
-              )} min`
+              etaData.totalDelay
+            )} min`
             : "+18 min",
 
       status: "upcoming",
@@ -982,13 +1032,12 @@ function App() {
 
   const selectTrain =
     async (train) => {
+
       setSelectedTrain(train);
 
       setSearchQuery(
         train.number
       );
-
-      // CLEAR OLD DATA
 
       setEtaData(null);
 
@@ -996,22 +1045,17 @@ function App() {
 
       setStationPredictions([]);
 
-      // GO TO DASHBOARD
-
       setActivePage(
         "dashboard"
       );
-
-      // GET LIVE TRAIN DATA
 
       const freshTrainData =
         await fetchLiveTrainData(
           train.number
         );
 
-      // RUN PREDICTIONS
-
       await Promise.all([
+
         predictETA(
           train.number,
           freshTrainData
@@ -1033,7 +1077,9 @@ function App() {
   // =========================
 
   const renderPage = () => {
+
     switch (activePage) {
+
       case "home":
         return (
           <Home
