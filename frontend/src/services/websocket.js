@@ -2,7 +2,12 @@ import { Client } from "@stomp/stompjs";
 
 let stompClient = null;
 
-const WEBSOCKET_URL = "ws://localhost:8080/ws";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:8080";
+
+const WEBSOCKET_URL =
+  API_BASE_URL.replace(/^http/, "ws") + "/ws";
 
 /* =========================================
    CONNECT TO TRAIN WEBSOCKET

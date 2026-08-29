@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import {
   connectTrainWebSocket,
   disconnectTrainWebSocket,
@@ -18,6 +18,9 @@ import Alerts from "./pages/Alerts";
 
 // API
 import { checkBackendHealth } from "./services/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:8080";
 
 function App() {
 
@@ -264,7 +267,7 @@ function App() {
       try {
 
         const response = await fetch(
-          "http://localhost:8080/api/simulation/status"
+          `${API_BASE_URL}/api/simulation/status`
         );
 
         if (!response.ok) {
@@ -443,7 +446,7 @@ function App() {
     {
       number: "12110",
       name: "Deccan Queen",
-      route: "Pune → Mumbai CST",
+      route: "Pune â†’ Mumbai CST",
       status: "Delayed",
       delay: "+15 min",
     },
@@ -451,7 +454,7 @@ function App() {
     {
       number: "12951",
       name: "Mumbai Rajdhani",
-      route: "Mumbai Central → New Delhi",
+      route: "Mumbai Central â†’ New Delhi",
       status: "On Time",
       delay: "On Time",
     },
@@ -459,7 +462,7 @@ function App() {
     {
       number: "22691",
       name: "Rajdhani Express",
-      route: "Bengaluru → New Delhi",
+      route: "Bengaluru â†’ New Delhi",
       status: "Delayed",
       delay: "+8 min",
     },
@@ -485,7 +488,7 @@ function App() {
     try {
 
       const response = await fetch(
-        "http://localhost:8080/api/simulation/status"
+        `${API_BASE_URL}/api/simulation/status`
       );
 
       if (!response.ok) {
@@ -646,7 +649,7 @@ function App() {
 
       const response =
         await fetch(
-          "http://localhost:8080/api/predict/eta",
+          `${API_BASE_URL}/api/predict/eta`,
           {
             method: "POST",
 
@@ -851,7 +854,7 @@ function App() {
 
         const response =
           await fetch(
-            "http://localhost:8080/api/predict/future-delay",
+            `${API_BASE_URL}/api/predict/future-delay`,
             {
               method: "POST",
 
@@ -959,7 +962,7 @@ function App() {
 
         const response =
           await fetch(
-            "http://localhost:8080/api/predict/station-wise",
+            `${API_BASE_URL}/api/predict/station-wise`,
             {
               method: "POST",
 

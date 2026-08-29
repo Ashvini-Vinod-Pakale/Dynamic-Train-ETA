@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL =
+  `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"}/api`;
 
 /* =========================================
    PREDICT TRAIN ETA
@@ -106,41 +107,55 @@ export const predictFutureDelay = async (
     throw error;
   }
 };
+
+
 /* =========================================
    GET LIVE TRAIN DATA
 ========================================= */
 
-export const getLiveTrainData = async (trainNumber) => {
+export const getLiveTrainData = async (
+  trainNumber
+) => {
   try {
     const response = await fetch(
       `${API_BASE_URL}/train/${trainNumber}/live`
     );
 
     if (!response.ok) {
-      throw new Error("Failed to get live train data");
+      throw new Error(
+        "Failed to get live train data"
+      );
     }
 
     return await response.json();
 
   } catch (error) {
-    console.error("Live Train API Error:", error);
+    console.error(
+      "Live Train API Error:",
+      error
+    );
+
     throw error;
   }
 };
+
+
 /* =========================================
    TRAIN SIMULATION
 ========================================= */
 
 export const startTrainSimulation = async () => {
   const response = await fetch(
-    "http://localhost:8080/api/simulation/start",
+    `${API_BASE_URL}/simulation/start`,
     {
       method: "POST",
     }
   );
 
   if (!response.ok) {
-    throw new Error("Failed to start train simulation");
+    throw new Error(
+      "Failed to start train simulation"
+    );
   }
 
   return await response.text();
@@ -149,14 +164,16 @@ export const startTrainSimulation = async () => {
 
 export const stopTrainSimulation = async () => {
   const response = await fetch(
-    "http://localhost:8080/api/simulation/stop",
+    `${API_BASE_URL}/simulation/stop`,
     {
       method: "POST",
     }
   );
 
   if (!response.ok) {
-    throw new Error("Failed to stop train simulation");
+    throw new Error(
+      "Failed to stop train simulation"
+    );
   }
 
   return await response.text();
@@ -165,7 +182,7 @@ export const stopTrainSimulation = async () => {
 
 export const getSimulationStatus = async () => {
   const response = await fetch(
-    "http://localhost:8080/api/simulation/status"
+    `${API_BASE_URL}/simulation/status`
   );
 
   if (!response.ok) {
