@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-
+import {
+  connectTrainWebSocket,
+  disconnectTrainWebSocket,
+} from "./services/websocket";
 import "./App.css";
 
 // COMPONENTS
@@ -146,6 +149,109 @@ function App() {
       clearInterval(interval);
 
   }, []);
+  // =========================
+  // LIVE WEBSOCKET UPDATES
+  // =========================
+
+  useEffect(() => {
+
+    console.log(
+      "Connecting to train WebSocket..."
+    );
+
+    connectTrainWebSocket((data) => {
+
+      console.log(
+        "WebSocket live train data:",
+        data
+      );
+
+      setLiveTrainData((previousData) => ({
+
+        ...previousData,
+
+        trainNumber:
+          data.trainNumber ||
+          previousData.trainNumber,
+
+        currentLatitude:
+          data.latitude ??
+          previousData.currentLatitude,
+
+        currentLongitude:
+          data.longitude ??
+          previousData.currentLongitude,
+
+        currentSpeed:
+          data.currentSpeed ??
+          previousData.currentSpeed,
+
+        currentDelay:
+          data.currentDelay ??
+          previousData.currentDelay,
+
+        previousDelay:
+          data.previousDelay ??
+          previousData.previousDelay,
+
+        currentStation:
+          data.currentLocation ||
+          previousData.currentStation,
+
+        nextStation:
+          data.nextStation ||
+          previousData.nextStation,
+
+        weatherFactor:
+          data.weatherFactor ??
+          previousData.weatherFactor,
+
+        trafficFactor:
+          data.trafficFactor ??
+          previousData.trafficFactor,
+
+        futureDelay:
+          data.futureDelay ??
+          previousData.futureDelay,
+
+        etaMinutes:
+          data.etaMinutes ??
+          previousData.etaMinutes,
+
+        predictedETA:
+          data.predictedETA ||
+          previousData.predictedETA,
+
+        confidenceScore:
+          data.confidenceScore ??
+          previousData.confidenceScore,
+
+        delayAlert:
+          data.delayAlert ||
+          previousData.delayAlert,
+
+        running:
+          data.running ??
+          previousData.running,
+
+        lastUpdated:
+          new Date().toISOString(),
+
+      }));
+
+    });
+
+    return () => {
+
+      console.log(
+        "Disconnecting train WebSocket..."
+      );
+
+      disconnectTrainWebSocket();
+
+    };
+
+  }, []);
 
   // =========================
   // LIVE SIMULATION UPDATES
@@ -203,6 +309,13 @@ function App() {
           previousDelay:
             data.previousDelay ??
             12,
+          confidenceScore:
+            data.confidenceScore ??
+            0,
+
+          futureDelay:
+            data.futureDelay ??
+            0,
 
           currentStation:
             data.currentLocation ||
@@ -234,27 +347,52 @@ function App() {
             data.confidenceScore ?? 0,
         });
 
-        setEtaData((previousData) => ({
-          ...previousData,
+        setEtaData((previousData) => {
 
-          scheduledArrival:
+          const currentDelay =
+            Number(
+              data.currentDelay ??
+              previousData?.currentDelay ??
+              0
+            );
+
+          const scheduledArrival =
             previousData?.scheduledArrival ||
-            "11:38 AM",
+            "11:38 AM";
 
-          currentDelay:
-            data.currentDelay ?? 0,
+          const predictedETA =
+            calculatePredictedTime(
+              scheduledArrival,
+              currentDelay
+            );
 
-          futureDelay:
-            data.futureDelay ?? 0,
+          return {
 
-          predictedETA:
-            data.predictedETA ||
-            previousData?.predictedETA ||
-            "",
+            ...previousData,
 
-          confidenceScore:
-            data.confidenceScore ?? 0,
-        }));
+            scheduledArrival,
+
+            currentDelay,
+
+            futureDelay:
+              Number(
+                data.futureDelay ??
+                previousData?.futureDelay ??
+                0
+              ),
+
+            predictedETA,
+
+            confidenceScore:
+              Number(
+                data.confidenceScore ??
+                previousData?.confidenceScore ??
+                0
+              ),
+
+          };
+
+        });
 
       } catch (error) {
 
@@ -566,6 +704,21 @@ function App() {
       const data =
         await response.json();
 
+      const consistentDelay =
+        Number(
+          data.expectedDelay ??
+          data.totalDelay ??
+          data.currentDelay ??
+          trainData.currentDelay ??
+          0
+        );
+
+      const consistentPredictedETA =
+        calculatePredictedTime(
+          scheduledArrival,
+          consistentDelay
+        );
+
       setEtaData({
 
         ...data,
@@ -577,6 +730,15 @@ function App() {
         currentDelay:
           data.currentDelay ??
           trainData.currentDelay,
+
+        expectedDelay:
+          consistentDelay,
+
+        totalDelay:
+          consistentDelay,
+
+        predictedETA:
+          consistentPredictedETA,
 
         nextStation:
           data.nextStation ||
@@ -941,6 +1103,52 @@ function App() {
         );
       }
     };
+  // =========================
+  // LIVE STATION-WISE UPDATES
+  // =========================
+
+  useEffect(() => {
+
+    if (!liveTrainData) {
+      return;
+    }
+
+    const updateStationPredictions = async () => {
+
+      try {
+
+        await predictStationWiseETA(
+          liveTrainData.trainNumber || "12123",
+          liveTrainData
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "Unable to update station-wise predictions:",
+          error
+        );
+
+      }
+
+    };
+
+    // Update immediately
+    updateStationPredictions();
+
+    // Update every 10 seconds
+    const interval = setInterval(
+      updateStationPredictions,
+      10000
+    );
+
+    return () => {
+      clearInterval(interval);
+    };
+
+  }, [
+    liveTrainData
+  ]);
 
   // =========================
   // STATION DATA
@@ -970,7 +1178,7 @@ function App() {
       time: "09:25",
 
       delay:
-        `+${currentDelay} min`,
+        `+${Number(currentDelay).toFixed(1)} min`,
 
       status: "current",
     },
@@ -988,7 +1196,7 @@ function App() {
           ? `+${stationPredictions[0].predictedDelay} min`
           : predictedDelay !== null
             ? `+${Math.round(predictedDelay)} min`
-            : `+${currentDelay} min`,
+            : `+${Number(currentDelay).toFixed(1)} min`,
 
       status: "upcoming",
     },
@@ -1087,6 +1295,7 @@ function App() {
             etaData={etaData}
             selectTrain={selectTrain}
             setActivePage={setActivePage}
+            liveTrainData={liveTrainData}
           />
         );
 
@@ -1124,7 +1333,7 @@ function App() {
           <LiveTrainMap
             stations={stations}
             currentSpeed={currentSpeed}
-            currentDelay={currentDelay}
+            currentDelay={Number(currentDelay).toFixed(1)}
             selectedTrain={selectedTrain}
             liveTrainData={liveTrainData}
           />
@@ -1135,7 +1344,7 @@ function App() {
           <Alerts
             predictedDelay={predictedDelay}
             etaData={etaData}
-            currentDelay={currentDelay}
+            currentDelay={Number(currentDelay).toFixed(1)}
             setActivePage={setActivePage}
             selectedTrain={selectedTrain}
           />
@@ -1148,6 +1357,7 @@ function App() {
             etaData={etaData}
             selectTrain={selectTrain}
             setActivePage={setActivePage}
+            liveTrainData={liveTrainData}
           />
         );
     }

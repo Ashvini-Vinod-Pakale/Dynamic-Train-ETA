@@ -13,16 +13,16 @@ function Alerts({
   etaData,
   currentDelay,
 }) {
-  const delay = predictedDelay ?? 15;
+  const delay = Number(predictedDelay ?? 15);
 
-  const currentTrainDelay = currentDelay ?? 15;
+  const currentTrainDelay = Number(currentDelay ?? 15);
 
   const predictedETA =
     etaData?.predictedETA || "11:56 AM";
 
   const getRiskLevel = () => {
     const totalDelay =
-      Number(currentTrainDelay) + Number(delay);
+      currentTrainDelay + delay;
 
     if (totalDelay <= 10) {
       return "Low";
@@ -67,9 +67,7 @@ function Alerts({
         <div className="alert-summary-item">
 
           <div className="summary-small-icon delay">
-
             <Clock3 size={18} />
-
           </div>
 
           <div>
@@ -79,7 +77,7 @@ function Alerts({
             </span>
 
             <strong>
-              +{currentTrainDelay} min
+              +{currentTrainDelay.toFixed(1)} min
             </strong>
 
           </div>
@@ -92,9 +90,7 @@ function Alerts({
         <div className="alert-summary-item">
 
           <div className="summary-small-icon future">
-
             <BrainCircuit size={18} />
-
           </div>
 
           <div>
@@ -104,7 +100,7 @@ function Alerts({
             </span>
 
             <strong>
-              +{delay} min
+              +{delay.toFixed(1)} min
             </strong>
 
           </div>
@@ -117,9 +113,7 @@ function Alerts({
         <div className="alert-summary-item">
 
           <div className="summary-small-icon risk">
-
             <CircleAlert size={18} />
-
           </div>
 
           <div>
@@ -129,9 +123,7 @@ function Alerts({
             </span>
 
             <strong className="risk-text">
-
               {riskLevel}
-
             </strong>
 
           </div>
@@ -144,9 +136,7 @@ function Alerts({
         <div className="alert-summary-item">
 
           <div className="summary-small-icon eta">
-
             <Clock3 size={18} />
-
           </div>
 
           <div>
@@ -156,9 +146,7 @@ function Alerts({
             </span>
 
             <strong>
-
               {predictedETA}
-
             </strong>
 
           </div>
@@ -178,9 +166,7 @@ function Alerts({
         <div className="alert-card warning-alert">
 
           <div className="alert-icon">
-
             <CircleAlert size={24} />
-
           </div>
 
           <div className="alert-content">
@@ -192,9 +178,7 @@ function Alerts({
               </h3>
 
               <span className="alert-badge warning">
-
                 ACTIVE
-
               </span>
 
             </div>
@@ -205,7 +189,7 @@ function Alerts({
               delayed by approximately{" "}
 
               <strong>
-                {currentTrainDelay} minutes
+                {currentTrainDelay.toFixed(1)} minutes
               </strong>
 
               .
@@ -230,9 +214,7 @@ function Alerts({
         <div className="alert-card info-alert">
 
           <div className="alert-icon">
-
             <BrainCircuit size={24} />
-
           </div>
 
           <div className="alert-content">
@@ -244,9 +226,7 @@ function Alerts({
               </h3>
 
               <span className="alert-badge info">
-
                 LIVE
-
               </span>
 
             </div>
@@ -256,7 +236,7 @@ function Alerts({
               The AI model predicts an additional{" "}
 
               <strong>
-                {delay} minutes
+                {delay.toFixed(1)} minutes
               </strong>
 
               {" "}of possible delay at upcoming stations.
@@ -281,9 +261,7 @@ function Alerts({
         <div className="alert-card success-alert">
 
           <div className="alert-icon">
-
             <Clock3 size={24} />
-
           </div>
 
           <div className="alert-content">
@@ -295,9 +273,7 @@ function Alerts({
               </h3>
 
               <span className="alert-badge success">
-
                 UPDATED
-
               </span>
 
             </div>
@@ -338,9 +314,7 @@ function Alerts({
         <div className="alert-card info-alert">
 
           <div className="alert-icon">
-
             <MapPin size={24} />
-
           </div>
 
           <div className="alert-content">
@@ -352,9 +326,7 @@ function Alerts({
               </h3>
 
               <span className="alert-badge info">
-
                 LIVE
-
               </span>
 
             </div>
@@ -390,9 +362,7 @@ function Alerts({
         <div className="alert-card success-alert">
 
           <div className="alert-icon">
-
             <CheckCircle2 size={24} />
-
           </div>
 
           <div className="alert-content">
@@ -404,9 +374,7 @@ function Alerts({
               </h3>
 
               <span className="alert-badge success">
-
                 ONLINE
-
               </span>
 
             </div>

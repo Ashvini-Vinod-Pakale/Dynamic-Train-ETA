@@ -161,9 +161,9 @@ function Dashboard({
   ========================================= */
 
   const predictedETA =
-    liveTrainData?.predictedETA ||
-    etaData?.predictedETA ||
-    "11:56 AM";
+  etaData?.predictedETA ||
+  liveTrainData?.predictedETA ||
+  "11:56 AM";
 
 
   const scheduledArrival =

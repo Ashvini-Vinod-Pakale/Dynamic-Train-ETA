@@ -16,7 +16,15 @@ function Home({
   etaData,
   selectTrain,
   setActivePage,
+  liveTrainData,
 }) {
+
+  const currentDelay =
+    Number(liveTrainData?.currentDelay ?? 0);
+
+  const confidenceScore =
+    Number(liveTrainData?.confidenceScore ?? 0);
+
   return (
     <div className="page-animation">
 
@@ -127,23 +135,35 @@ function Home({
 
             <div>
               <span>Current Speed</span>
-              <strong>64 km/h</strong>
+
+              <strong>
+                {Number(
+                  liveTrainData?.currentSpeed ?? 0
+                ).toFixed(1)} km/h
+              </strong>
             </div>
+
 
             <div>
               <span>Current Delay</span>
+
               <strong className="orange-text">
-                +15 min
+                +{Number(
+                  liveTrainData?.currentDelay ?? 0
+                ).toFixed(1)} min
               </strong>
             </div>
+
 
             <div>
               <span>Confidence</span>
 
               <strong className="green-text">
-                {etaData
-                  ? `${etaData.confidenceScore}%`
-                  : "92%"}
+                {Number(
+                  liveTrainData?.confidenceScore ??
+                  etaData?.confidenceScore ??
+                  0
+                ).toFixed(2)}%
               </strong>
             </div>
 
@@ -250,7 +270,7 @@ function Home({
         <StatCard
           icon={Clock3}
           label="AVERAGE DELAY"
-          value="8.4 min"
+          value={`${currentDelay.toFixed(1)} min`}
           description="Based on current railway conditions"
           cardClass="orange-card"
         />
@@ -258,7 +278,7 @@ function Home({
         <StatCard
           icon={BrainCircuit}
           label="PREDICTION CONFIDENCE"
-          value="94.6%"
+          value={`${confidenceScore.toFixed(1)}%`}
           description="AI model prediction confidence"
           cardClass="green-card"
         />
