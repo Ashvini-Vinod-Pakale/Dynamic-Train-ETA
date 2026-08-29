@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   connectTrainWebSocket,
   disconnectTrainWebSocket,
@@ -446,7 +446,7 @@ function App() {
     {
       number: "12110",
       name: "Deccan Queen",
-      route: "Pune â†’ Mumbai CST",
+      route: "Pune → Mumbai CST",
       status: "Delayed",
       delay: "+15 min",
     },
@@ -454,7 +454,7 @@ function App() {
     {
       number: "12951",
       name: "Mumbai Rajdhani",
-      route: "Mumbai Central â†’ New Delhi",
+      route: "Mumbai Central → New Delhi",
       status: "On Time",
       delay: "On Time",
     },
@@ -462,7 +462,7 @@ function App() {
     {
       number: "22691",
       name: "Rajdhani Express",
-      route: "Bengaluru â†’ New Delhi",
+      route: "Bengaluru → New Delhi",
       status: "Delayed",
       delay: "+8 min",
     },
@@ -1423,3 +1423,4 @@ function App() {
 }
 
 export default App;
+
