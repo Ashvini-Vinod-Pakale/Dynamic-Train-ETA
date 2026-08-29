@@ -4553,7 +4553,7 @@ input {
       rgba(255, 255, 255, 0.48) 42%,
       rgba(10, 15, 35, 0.08) 100%
     ),
-    url("./Image.png");
+    url("./assets/image.png");
 
   background-size: cover;
   background-position: center;
@@ -7332,7 +7332,7 @@ input {
       rgba(245, 243, 255, 0.88),
       rgba(237, 233, 254, 0.82)
     ),
-    url("/train-background.jpg");
+    url("./assets/image.png");
 
   background-size: cover;
 
