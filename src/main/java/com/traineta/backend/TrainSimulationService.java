@@ -1,5 +1,6 @@
 package com.traineta.backend;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,15 @@ public class TrainSimulationService {
 
                 this.messagingTemplate = messagingTemplate;
                 this.futureDelayService = futureDelayService;
+        }
+
+        // ==========================================
+        // AUTO START
+        // ==========================================
+
+        @PostConstruct
+        public void initializeSimulation() {
+                startSimulation();
         }
 
         // ==========================================
@@ -116,14 +126,12 @@ public class TrainSimulationService {
         };
 
         /*
-         * Index of the current route segment.
-         *
-         * Example:
+         * Current route segment.
          *
          * 0  = Nashik Road
-         * 9  = Manmad area
-         * 27 = Dadar area
-         * 31 = Mumbai CST
+         * 10 = Manmad
+         * 28 = Dadar
+         * 32 = Mumbai CST
          */
         private int routeIndex = 0;
 
@@ -148,7 +156,7 @@ public class TrainSimulationService {
                                         // 1. Update train position
                                         updateTrainData();
 
-                                        // 2. ML + ETA prediction
+                                        // 2. Calculate ML + Dynamic ETA
                                         calculateDynamicETA();
 
                                         // 3. Send complete live data
@@ -156,6 +164,7 @@ public class TrainSimulationService {
                                                         "/topic/train-status",
                                                         getStatus());
 
+                                        // Update every 10 seconds
                                         Thread.sleep(10000);
 
                                 } catch (InterruptedException e) {
@@ -165,7 +174,7 @@ public class TrainSimulationService {
                                 }
                         }
 
-                });
+                }, "train-simulation-thread");
 
                 simulationThread.setDaemon(true);
                 simulationThread.start();
@@ -175,7 +184,7 @@ public class TrainSimulationService {
         // STOP SIMULATION
         // ==========================================
 
-        public void stopSimulation() {
+        public synchronized void stopSimulation() {
 
                 running.set(false);
 
@@ -185,10 +194,60 @@ public class TrainSimulationService {
         }
 
         // ==========================================
+        // RESET SIMULATION
+        // ==========================================
+
+        private synchronized void resetSimulation() {
+
+                routeIndex = 0;
+
+                currentLocation = "Nashik Road";
+                nextStation = "Manmad";
+
+                latitude = ROUTE[0][0];
+                longitude = ROUTE[0][1];
+
+                currentSpeed = 68.0;
+                currentDelay = 18.0;
+                previousDelay = 15.0;
+
+                weatherFactor = 0;
+                trafficFactor = 0;
+
+                futureDelay = 0.0;
+                etaMinutes = 0.0;
+                confidenceScore = 0.0;
+
+                predictedETA = "";
+                delayAlert = "";
+
+                System.out.println("========================================");
+                System.out.println("TRAIN JOURNEY RESET");
+                System.out.println("Train Number : " + trainNumber);
+                System.out.println("Starting From: Nashik Road");
+                System.out.println("Next Station : Manmad");
+                System.out.println("========================================");
+        }
+
+        // ==========================================
         // UPDATE SIMULATION DATA
         // ==========================================
 
         private synchronized void updateTrainData() {
+
+                // ----------------------------------------
+                // CHECK DESTINATION
+                // ----------------------------------------
+
+                if (routeIndex >= ROUTE.length - 1) {
+
+                        resetSimulation();
+
+                        // Continue running
+                        running.set(true);
+
+                        return;
+                }
 
                 // ----------------------------------------
                 // PREVIOUS DELAY
@@ -220,10 +279,9 @@ public class TrainSimulationService {
 
                 currentDelay += delayChange;
 
-                currentDelay =
-                                Math.max(
-                                                0.0,
-                                                currentDelay);
+                currentDelay = Math.max(
+                                0.0,
+                                currentDelay);
 
                 // ----------------------------------------
                 // ROUTE MOVEMENT
@@ -241,7 +299,7 @@ public class TrainSimulationService {
                                                 : 0;
 
                 // ----------------------------------------
-                // TRAFFIC SIMULATION
+                // TRAFFIC / OPERATIONAL SIMULATION
                 // ----------------------------------------
 
                 trafficFactor =
@@ -314,19 +372,9 @@ public class TrainSimulationService {
         // MOVE TRAIN ALONG ROUTE
         // ==========================================
 
-        private void moveTrainAlongRoute() {
+        private synchronized void moveTrainAlongRoute() {
 
-                // Already at destination
                 if (routeIndex >= ROUTE.length - 1) {
-
-                        latitude = ROUTE[ROUTE.length - 1][0];
-                        longitude = ROUTE[ROUTE.length - 1][1];
-
-                        currentLocation = "Mumbai CST";
-                        nextStation = "Journey Complete";
-
-                        running.set(false);
-
                         return;
                 }
 
@@ -344,23 +392,16 @@ public class TrainSimulationService {
                                                 targetLongitude);
 
                 /*
-                 * Convert speed into approximate movement
-                 * for the 10-second simulation interval.
+                 * Speed = km/h
                  *
-                 * currentSpeed = km/h
+                 * Simulation interval = 10 seconds
                  *
-                 * 10 seconds = 10 / 3600 hours
-                 *
-                 * distance = speed × time
+                 * Distance = speed × time
                  */
                 double movementDistance =
                                 currentSpeed *
                                 (10.0 / 3600.0);
 
-                /*
-                 * Keep the movement controlled so the train
-                 * does not jump over route points.
-                 */
                 double interpolation;
 
                 if (distance <= movementDistance) {
@@ -373,8 +414,7 @@ public class TrainSimulationService {
                 } else {
 
                         interpolation =
-                                        movementDistance /
-                                        distance;
+                                        movementDistance / distance;
 
                         latitude +=
                                         (targetLatitude - latitude)
@@ -392,7 +432,7 @@ public class TrainSimulationService {
         // UPDATE CURRENT + NEXT STATION
         // ==========================================
 
-        private void updateStationInformation() {
+        private synchronized void updateStationInformation() {
 
                 /*
                  * Nashik Road → Manmad
@@ -428,7 +468,9 @@ public class TrainSimulationService {
                 }
 
                 /*
-                 * Destination reached
+                 * Destination reached.
+                 *
+                 * The next update will reset the journey.
                  */
                 currentLocation = "Mumbai CST";
                 nextStation = "Journey Complete";
@@ -438,8 +480,6 @@ public class TrainSimulationService {
 
                 longitude =
                                 ROUTE[ROUTE.length - 1][1];
-
-                running.set(false);
         }
 
         // ==========================================
@@ -489,7 +529,7 @@ public class TrainSimulationService {
         private synchronized void calculateDynamicETA() {
 
                 // ----------------------------------------
-                // 1. ML FUTURE DELAY
+                // 1. FUTURE DELAY PREDICTION
                 // ----------------------------------------
 
                 futureDelay =
@@ -574,7 +614,7 @@ public class TrainSimulationService {
                 }
 
                 // ----------------------------------------
-                // DISPLAY PREDICTION
+                // CONSOLE PREDICTION
                 // ----------------------------------------
 
                 System.out.println(
@@ -608,7 +648,7 @@ public class TrainSimulationService {
         // DYNAMIC ROUTE DISTANCE
         // ==========================================
 
-        private double routeDistance() {
+        private synchronized double routeDistance() {
 
                 if (routeIndex >= ROUTE.length - 1) {
                         return 0.0;
@@ -644,7 +684,7 @@ public class TrainSimulationService {
         // CONFIDENCE
         // ==========================================
 
-        private double calculateConfidence() {
+        private synchronized double calculateConfidence() {
 
                 double confidence = 95.0;
 
