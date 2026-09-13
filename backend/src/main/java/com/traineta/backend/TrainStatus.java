@@ -1,4 +1,3 @@
-
 package com.traineta.backend;
 
 import jakarta.persistence.*;
@@ -36,8 +35,14 @@ public class TrainStatus {
     // TRAIN STATUS
     // =====================================================
 
+    @Column(name = "train_status")
+    private String trainStatus;
+
     @Column(name = "current_speed")
     private Double currentSpeed;
+
+    @Column(name = "average_speed")
+    private Double averageSpeed;
 
     @Column(name = "current_delay")
     private Double currentDelay;
@@ -53,6 +58,13 @@ public class TrainStatus {
 
     @Column(name = "next_station")
     private String nextStation;
+
+    // =====================================================
+    // ROUTE DISTANCE
+    // =====================================================
+
+    @Column(name = "route_distance")
+    private Double routeDistance;
 
     // =====================================================
     // PREDICTION
@@ -128,12 +140,28 @@ public class TrainStatus {
         this.longitude = longitude;
     }
 
+    public String getTrainStatus() {
+        return trainStatus;
+    }
+
+    public void setTrainStatus(String trainStatus) {
+        this.trainStatus = trainStatus;
+    }
+
     public Double getCurrentSpeed() {
         return currentSpeed;
     }
 
     public void setCurrentSpeed(Double currentSpeed) {
         this.currentSpeed = currentSpeed;
+    }
+
+    public Double getAverageSpeed() {
+        return averageSpeed;
+    }
+
+    public void setAverageSpeed(Double averageSpeed) {
+        this.averageSpeed = averageSpeed;
     }
 
     public Double getCurrentDelay() {
@@ -174,6 +202,14 @@ public class TrainStatus {
 
     public void setNextStation(String nextStation) {
         this.nextStation = nextStation;
+    }
+
+    public Double getRouteDistance() {
+        return routeDistance;
+    }
+
+    public void setRouteDistance(Double routeDistance) {
+        this.routeDistance = routeDistance;
     }
 
     public Double getFutureDelay() {
