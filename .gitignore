@@ -32,3 +32,20 @@ build/
 ### VS Code ###
 .vscode/
 target/
+
+# Secrets & Local Config
+.env
+.env.*
+application-local.properties
+application-*.properties
+
+# Logs
+logs/
+*.log
+
+# Temporary backups
+*.before-*
+*.bak
+
+# Local scratch file
+railradar-service.txt

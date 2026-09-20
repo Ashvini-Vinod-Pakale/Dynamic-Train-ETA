@@ -1,0 +1,502 @@
+/* ==========================================================================
+   ALERTS PAGE STYLES - DEDICATED STYLESHEET
+   Railway Intelligence / Live Train Alerts & Notifications System
+   ========================================================================== */
+
+/* =========================================
+   PAGE CONTAINER & BACKGROUND
+========================================= */
+.alerts-page {
+  position: relative !important;
+  min-height: calc(100vh - 80px) !important;
+  padding: 45px 40px 80px !important;
+  box-sizing: border-box !important;
+  background: linear-gradient(180deg, #edf5fc 0%, #e1eef8 45%, #d8e8f5 100%) !important;
+  overflow: hidden !important;
+}
+
+/* =========================================
+   PAGE HEADING (CENTERED 3D)
+========================================= */
+.alerts-page .page-heading {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  max-width: 900px !important;
+  margin: 0 auto 32px auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.alerts-page .page-heading span,
+.alerts-page .alerts-pretitle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 12px !important;
+  color: #2563eb !important;
+  background: rgba(37, 99, 235, 0.08) !important;
+  border: 1px solid rgba(37, 99, 235, 0.16) !important;
+  padding: 3px 14px !important;
+  border-radius: 20px !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 2px !important;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.04) !important;
+}
+
+.alerts-page .page-heading h1,
+.alerts-page .alerts-main-title {
+  margin: 0 0 14px 0 !important;
+  font-size: 44px !important;
+  line-height: 1.18 !important;
+  font-weight: 850 !important;
+  letter-spacing: -0.028em !important;
+  text-align: center !important;
+  display: inline-block !important;
+  cursor: default !important;
+  user-select: none !important;
+
+  /* Railway intelligence animated color flow */
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #1e40af 18%,
+    #0284c7 38%,
+    #4f46e5 56%,
+    #0ea5e9 74%,
+    #1d4ed8 88%,
+    #0f172a 100%
+  ) !important;
+  background-size: 260% 260% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  animation: alertsHeadingFlow 9s ease-in-out infinite alternate !important;
+
+  /* Subtle realistic 3D physical depth applied directly to the text glyphs */
+  filter:
+    drop-shadow(0 1px 0px rgba(15, 23, 42, 0.42))
+    drop-shadow(0 2px 0px rgba(30, 58, 138, 0.32))
+    drop-shadow(0 3px 0.5px rgba(15, 23, 42, 0.22))
+    drop-shadow(0 5px 2px rgba(15, 23, 42, 0.10))
+    drop-shadow(0 8px 14px rgba(37, 99, 235, 0.12)) !important;
+}
+
+@keyframes alertsHeadingFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.alerts-page .page-heading p,
+.alerts-page .alerts-subtitle {
+  margin: 0 auto !important;
+  max-width: 700px !important;
+  color: #475569 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  line-height: 1.7 !important;
+  text-align: center !important;
+}
+
+/* =========================================
+   ALERTS SUMMARY
+========================================= */
+.alerts-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 0 !important;
+  margin-bottom: 30px !important;
+}
+
+.alert-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 16px 18px;
+  background: #B1C6B3 !important;
+  border: 1px solid rgba(40, 65, 45, 0.18) !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(25, 45, 30, 0.06);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.alert-summary-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(25, 45, 30, 0.12);
+}
+
+/* Summary Icon */
+.summary-small-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summary-small-icon.delay {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.12);
+}
+
+.summary-small-icon.future {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.summary-small-icon.risk {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.summary-small-icon.eta {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.alert-summary-item span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 5px;
+}
+
+.alert-summary-item strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.risk-text {
+  color: #ef4444 !important;
+}
+
+/* =========================================
+   ALERTS GRID
+========================================= */
+.alerts-page .alerts-grid {
+  position: relative !important;
+  z-index: 2 !important;
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 22px !important;
+  width: 100% !important;
+  margin: 0 0 28px !important;
+  padding: 0 !important;
+  align-items: stretch !important;
+}
+
+.alerts-page .alerts-grid > .alert-card {
+  grid-column: span 2 !important;
+}
+
+.alerts-page .alerts-grid > .alert-card:nth-child(4) {
+  grid-column: 2 / span 2 !important;
+}
+
+.alerts-page .alerts-grid > .alert-card:nth-child(5) {
+  grid-column: 4 / span 2 !important;
+}
+
+/* =========================================
+   ALERT CARD
+========================================= */
+.alerts-page .alert-card {
+  position: relative !important;
+  display: flex !important;
+  gap: 18px !important;
+  padding: 24px !important;
+  box-sizing: border-box !important;
+  border-radius: 20px !important;
+  background: #E7EFE8 !important;
+  border: 1px solid #b0c4d8 !important;
+  box-shadow:
+    0 10px 30px rgba(30, 41, 59, 0.05) !important;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease !important;
+  min-height: 220px !important;
+}
+
+.alerts-page .alert-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow:
+    0 18px 40px rgba(30, 41, 59, 0.10) !important;
+  border-color: #9cb5cb !important;
+}
+
+/* ALERT ICON */
+.alerts-page .alert-icon {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.alerts-page .warning-alert .alert-icon {
+  color: #f97316 !important;
+  background:
+    linear-gradient(135deg, #fff7ed, #ffedd5) !important;
+  border: 1px solid rgba(249, 115, 22, 0.18) !important;
+}
+
+.alerts-page .info-alert .alert-icon {
+  color: #2563eb !important;
+  background:
+    linear-gradient(135deg, #eff6ff, #dbeafe) !important;
+  border: 1px solid rgba(37, 99, 235, 0.18) !important;
+}
+
+.alerts-page .success-alert .alert-icon {
+  color: #16a34a !important;
+  background:
+    linear-gradient(135deg, #f0fdf4, #dcfce7) !important;
+  border: 1px solid rgba(22, 163, 74, 0.18) !important;
+}
+
+/* ALERT CONTENT */
+.alerts-page .alert-content {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+.alerts-page .alert-title-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 10px !important;
+}
+
+.alerts-page .alert-title-row h3 {
+  margin: 0 !important;
+  color: #1f2937 !important;
+  font-size: 18px !important;
+  font-weight: 750 !important;
+  line-height: 1.3 !important;
+}
+
+.alerts-page .alert-content p {
+  margin: 0 0 16px !important;
+  color: #4b5563 !important;
+  font-size: 14px !important;
+  line-height: 1.65 !important;
+}
+
+.alerts-page .alert-badge {
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+}
+
+.alerts-page .alert-badge.warning {
+  color: #c2410c !important;
+  background: #ffedd5 !important;
+  border: 1px solid rgba(249, 115, 22, 0.22) !important;
+}
+
+.alerts-page .alert-badge.info {
+  color: #1d4ed8 !important;
+  background: #dbeafe !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+}
+
+.alerts-page .alert-badge.success {
+  color: #15803d !important;
+  background: #dcfce7 !important;
+  border: 1px solid rgba(22, 163, 74, 0.22) !important;
+}
+
+/* ALERT TIME */
+.alerts-page .alert-time {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  margin-top: auto !important;
+}
+
+.alerts-page .warning-alert .alert-time svg {
+  color: #ea580c !important;
+}
+
+.alerts-page .info-alert .alert-time svg {
+  color: #635bdb !important;
+}
+
+.alerts-page .success-alert .alert-time svg {
+  color: #16a34a !important;
+}
+
+/* =========================================
+   RESPONSIVE STYLES
+========================================= */
+@media (max-width: 1200px) {
+  .alerts-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .alerts-page .alerts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .alerts-page .alerts-grid > .alert-card {
+    grid-column: auto !important;
+  }
+
+  .alerts-page .alerts-grid > .alert-card:nth-child(4) {
+    grid-column: auto !important;
+  }
+
+  .alerts-page .alerts-grid > .alert-card:nth-child(5) {
+    grid-column: 1 / -1 !important;
+    max-width: 520px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .alerts-page {
+    padding: 35px 20px 60px !important;
+  }
+
+  .alerts-page .page-heading h1 {
+    font-size: 32px !important;
+  }
+
+  .alerts-page .alerts-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .alerts-page .alerts-grid > .alert-card,
+  .alerts-page .alerts-grid > .alert-card:nth-child(4),
+  .alerts-page .alerts-grid > .alert-card:nth-child(5) {
+    grid-column: auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .alerts-page .alert-card {
+    min-height: auto !important;
+    padding: 20px !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .alerts-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .alert-summary-item {
+    padding: 14px;
+  }
+}
+
+/* =========================================
+   LEGACY ALERT STYLES (PRESERVED)
+========================================= */
+
+.alerts-page-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modern-alert {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 18px;
+  background: white;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.modern-alert-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modern-alert > div:nth-child(2) {
+  flex: 1;
+}
+
+.modern-alert span {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-light);
+}
+
+.modern-alert h3 {
+  margin-top: 5px;
+}
+
+.modern-alert p {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.danger-modern .modern-alert-icon {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+.warning-modern .modern-alert-icon {
+  color: #d97706;
+  background: #fef3c7;
+}
+
+.info-modern .modern-alert-icon {
+  color: #2563eb;
+  background: #dbeafe;
+}
+
+.success-modern .modern-alert-icon {
+  color: #16a34a;
+  background: #dcfce7;
+}

@@ -1,6 +1,7 @@
 import {
   Menu,
   Bell,
+  ChevronDown,
 } from "lucide-react";
 
 function Topbar({
@@ -31,19 +32,26 @@ function Topbar({
       {/* RIGHT SECTION */}
       <div className="topbar-right">
 
-        <div className="system-online">
-          <span></span>
-          System Online
-        </div>
-
         <button
           className="notification-btn"
           onClick={() =>
             setActivePage("alerts")
           }
+          aria-label="View notifications"
         >
           <Bell size={20} />
         </button>
+
+        {/* USER PROFILE */}
+        <div className="topbar-user-profile">
+          <div className="topbar-avatar">
+            <span>AT</span>
+          </div>
+          <div className="topbar-user-info">
+            <span className="topbar-user-name">Alex Turner</span>
+          </div>
+          <ChevronDown size={15} className="topbar-dropdown-arrow" />
+        </div>
 
       </div>
 

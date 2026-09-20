@@ -5,13 +5,13 @@ import {
   Bell,
   Train,
   Activity,
-  BrainCircuit,
 } from "lucide-react";
 
 function Sidebar({
   activePage,
   setActivePage,
   sidebarOpen,
+  setSidebarOpen,
 }) {
   const navItems = [
     {
@@ -63,7 +63,6 @@ function Sidebar({
             </span>
           </div>
         )}
-
       </div>
 
       {/* MENU LABEL */}
@@ -101,32 +100,6 @@ function Sidebar({
         })}
 
       </nav>
-
-      {/* BOTTOM AI CARD */}
-      <div className="sidebar-bottom">
-
-        {sidebarOpen && (
-          <div className="ai-powered-card">
-
-            <div className="ai-powered-icon">
-              <BrainCircuit size={22} />
-            </div>
-
-            <div>
-              <strong>
-                AI Powered
-              </strong>
-
-              <span>
-                Smart predictions active
-              </span>
-            </div>
-
-          </div>
-        )}
-
-      </div>
-
     </aside>
   );
 }

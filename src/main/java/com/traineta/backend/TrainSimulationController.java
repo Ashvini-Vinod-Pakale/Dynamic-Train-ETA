@@ -20,7 +20,7 @@ public class TrainSimulationController {
 
         simulationService.startSimulation();
 
-        return "Train simulation started successfully";
+        return "Train simulation started successfully (broadcasting to isolated topic: " + simulationService.getSimulationTopic() + ")";
     }
 
     @PostMapping("/stop")

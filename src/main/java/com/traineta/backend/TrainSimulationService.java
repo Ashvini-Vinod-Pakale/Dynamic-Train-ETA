@@ -1,6 +1,6 @@
 package com.traineta.backend;
 
-import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +16,9 @@ public class TrainSimulationService {
         private final SimpMessagingTemplate messagingTemplate;
         private final FutureDelayService futureDelayService;
 
+        @Value("${simulation.websocket.topic:/topic/simulation-status}")
+        private String simulationTopic = "/topic/simulation-status";
+
         public TrainSimulationService(
                         SimpMessagingTemplate messagingTemplate,
                         FutureDelayService futureDelayService) {
@@ -25,12 +28,13 @@ public class TrainSimulationService {
         }
 
         // ==========================================
-        // AUTO START
+        // AUTO START (DISABLED)
+        // Automatic startup is disabled to ensure REAL-DATA-ONLY flow.
+        // Simulation can only be manually triggered via POST /api/simulation/start for testing.
         // ==========================================
 
-        @PostConstruct
-        public void initializeSimulation() {
-                startSimulation();
+        public String getSimulationTopic() {
+                return simulationTopic;
         }
 
         // ==========================================
@@ -159,9 +163,9 @@ public class TrainSimulationService {
                                         // 2. Calculate ML + Dynamic ETA
                                         calculateDynamicETA();
 
-                                        // 3. Send complete live data
+                                        // 3. Send complete live data (to isolated simulation topic)
                                         messagingTemplate.convertAndSend(
-                                                        "/topic/train-status",
+                                                        simulationTopic,
                                                         getStatus());
 
                                         // Update every 10 seconds
@@ -189,7 +193,7 @@ public class TrainSimulationService {
                 running.set(false);
 
                 messagingTemplate.convertAndSend(
-                                "/topic/train-status",
+                                simulationTopic,
                                 getStatus());
         }
 
