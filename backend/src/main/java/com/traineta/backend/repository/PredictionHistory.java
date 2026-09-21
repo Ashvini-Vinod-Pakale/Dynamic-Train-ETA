@@ -29,8 +29,7 @@ public class PredictionHistory {
     private String delayAlert;
     private LocalDateTime createdAt;
 
-    public PredictionHistory() {
-    }
+    public PredictionHistory() {}
 
     public Integer getId() {
         return id;

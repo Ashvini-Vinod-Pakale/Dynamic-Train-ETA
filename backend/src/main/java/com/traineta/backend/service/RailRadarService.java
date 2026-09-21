@@ -2,6 +2,8 @@ package com.traineta.backend.service;
 
 import com.traineta.backend.TrainStatus;
 import com.traineta.backend.repository.TrainStatusRepository;
+import com.traineta.backend.repository.PredictionHistory;
+import com.traineta.backend.repository.PredictionHistoryRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +18,7 @@ public class RailRadarService {
     private final RestClient restClient;
     private final RailRadarDataMapper dataMapper;
     private final TrainStatusRepository trainStatusRepository;
+    private final PredictionHistoryRepository predictionHistoryRepository;
     private final LivePredictionService livePredictionService;
     private final WeatherService weatherService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -29,6 +32,7 @@ public class RailRadarService {
     public RailRadarService(
             RailRadarDataMapper dataMapper,
             TrainStatusRepository trainStatusRepository,
+            PredictionHistoryRepository predictionHistoryRepository,
             LivePredictionService livePredictionService,
             WeatherService weatherService,
             SimpMessagingTemplate messagingTemplate) {
@@ -36,6 +40,7 @@ public class RailRadarService {
         this.restClient = RestClient.builder().build();
         this.dataMapper = dataMapper;
         this.trainStatusRepository = trainStatusRepository;
+        this.predictionHistoryRepository = predictionHistoryRepository;
         this.livePredictionService = livePredictionService;
         this.weatherService = weatherService;
         this.messagingTemplate = messagingTemplate;
@@ -103,7 +108,7 @@ public class RailRadarService {
 
 
         // =====================================================
-        // STEP 4: GET PREVIOUS DELAY FROM MYSQL
+        // STEP 4: GET PREVIOUS DELAY FROM DATABASE
         // =====================================================
 
         var previousTrain =
@@ -146,7 +151,7 @@ public class RailRadarService {
 
 
         // =====================================================
-        // STEP 7: SAVE TO MYSQL
+        // STEP 7: SAVE CURRENT TRAIN STATUS
         // =====================================================
 
         TrainStatus savedTrain =
@@ -156,7 +161,83 @@ public class RailRadarService {
 
 
         // =====================================================
-        // STEP 8: SEND LIVE UPDATE THROUGH WEBSOCKET
+        // STEP 8: SAVE PREDICTION HISTORY
+        // =====================================================
+
+        PredictionHistory history =
+                new PredictionHistory();
+
+        history.setTrainNumber(
+                savedTrain.getTrainNumber()
+        );
+
+        history.setCurrentLocation(
+                savedTrain.getCurrentLocation()
+        );
+
+        history.setNextStation(
+                savedTrain.getNextStation()
+        );
+
+        history.setCurrentSpeed(
+                savedTrain.getCurrentSpeed()
+        );
+
+        history.setCurrentDelay(
+                savedTrain.getCurrentDelay()
+        );
+
+        history.setFutureDelay(
+                savedTrain.getFutureDelay()
+        );
+
+        history.setPredictedEta(
+                savedTrain.getPredictedEta()
+        );
+
+        history.setConfidenceScore(
+                savedTrain.getConfidenceScore()
+        );
+
+        history.setDelayAlert(
+                savedTrain.getDelayAlert()
+        );
+
+        // Dynamic ETA in minutes
+        double selectedSpeed;
+
+        if (savedTrain.getCurrentSpeed() > 0) {
+            selectedSpeed = savedTrain.getCurrentSpeed();
+        } else {
+            selectedSpeed = savedTrain.getAverageSpeed();
+        }
+
+        double etaMinutes = 0.0;
+
+        if (selectedSpeed > 0 &&
+                savedTrain.getRouteDistance() >= 0) {
+
+            double travelTime =
+                    (savedTrain.getRouteDistance()
+                            / selectedSpeed) * 60.0;
+
+            etaMinutes =
+                    travelTime
+                            + savedTrain.getCurrentDelay()
+                            + savedTrain.getFutureDelay();
+        }
+
+        history.setEtaMinutes(
+                Math.round(etaMinutes * 100.0) / 100.0
+        );
+
+        predictionHistoryRepository.save(
+                history
+        );
+
+
+        // =====================================================
+        // STEP 9: SEND LIVE UPDATE THROUGH WEBSOCKET
         // =====================================================
 
         System.out.println(
@@ -171,7 +252,7 @@ public class RailRadarService {
 
 
         // =====================================================
-        // STEP 9: RETURN RESPONSE
+        // STEP 10: RETURN RESPONSE
         // =====================================================
 
         return savedTrain;

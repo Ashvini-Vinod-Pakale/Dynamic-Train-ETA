@@ -4,7 +4,7 @@ package com.traineta.backend;
 import com.traineta.backend.repository.TrainStatusRepository;
 import com.traineta.backend.repository.PredictionHistoryRepository;
 import com.traineta.backend.repository.PredictionHistory;
-
+import com.traineta.backend.repository.PredictionHistory;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
