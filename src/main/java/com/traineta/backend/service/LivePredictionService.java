@@ -2,6 +2,8 @@ package com.traineta.backend.service;
 
 import com.traineta.backend.FutureDelayService;
 import com.traineta.backend.TrainStatus;
+import com.traineta.backend.repository.PredictionHistory;
+import com.traineta.backend.repository.PredictionHistoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,13 +13,14 @@ import java.time.format.DateTimeFormatter;
 public class LivePredictionService {
 
     private final FutureDelayService futureDelayService;
-
+    private final PredictionHistoryRepository predictionHistoryRepository;
     public LivePredictionService(
-            FutureDelayService futureDelayService) {
+        FutureDelayService futureDelayService,
+        PredictionHistoryRepository predictionHistoryRepository) {
 
-        this.futureDelayService = futureDelayService;
-    }
-
+    this.futureDelayService = futureDelayService;
+    this.predictionHistoryRepository = predictionHistoryRepository;
+}
     public TrainStatus predictFutureDelay(
             TrainStatus trainStatus) {
 
@@ -142,7 +145,7 @@ public class LivePredictionService {
 
         // Determine if train journey has reached destination / completed
         boolean isCompleted = isJourneyCompleted(trainStatus);
-
+        double etaMinutes = 0.0;
         if (isCompleted) {
             // Train has already arrived at destination
             String actualArrival = resolveActualDestinationArrival(trainStatus);
@@ -169,6 +172,23 @@ public class LivePredictionService {
                 String calculatedArrival = calculatePredictedArrival(schedArrival, totalDelay);
                 if (calculatedArrival != null) {
                     trainStatus.setPredictedEta(calculatedArrival);
+                      int[] predictedParts = parseTimeParts(calculatedArrival);
+    if (predictedParts != null) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime predictedDateTime = now
+                .withHour(predictedParts[0])
+                .withMinute(predictedParts[1])
+                .withSecond(0)
+                .withNano(0);
+
+        if (predictedDateTime.isBefore(now)) {
+            predictedDateTime = predictedDateTime.plusDays(1);
+        }
+
+        etaMinutes = java.time.Duration
+                .between(now, predictedDateTime)
+                .toSeconds() / 60.0;
+    }
                     calculatedFromSchedule = true;
                 }
             }
@@ -184,7 +204,7 @@ public class LivePredictionService {
                             travelTime
                                     + currentDelay
                                     + futureDelay;
-
+                    etaMinutes = dynamicEta;
                     // Calculate predicted arrival time
                     LocalDateTime predictedArrival =
                             LocalDateTime.now().plusSeconds(
@@ -224,6 +244,20 @@ public class LivePredictionService {
         trainStatus.setConfidenceScore(
                 round(confidence)
         );
+        PredictionHistory history = new PredictionHistory();
+
+        history.setTrainNumber(trainStatus.getTrainNumber());
+        history.setCurrentLocation(trainStatus.getCurrentLocation());
+        history.setNextStation(trainStatus.getNextStation());
+        history.setCurrentSpeed(currentSpeedVal);
+        history.setCurrentDelay(currentDelayVal);
+        history.setFutureDelay(futureDelay);
+        history.setEtaMinutes(etaMinutes);
+        history.setConfidenceScore(round(confidence));
+        history.setPredictedEta(trainStatus.getPredictedEta());
+        history.setDelayAlert(trainStatus.getDelayAlert());
+
+        predictionHistoryRepository.save(history);
 
 
         return trainStatus;
