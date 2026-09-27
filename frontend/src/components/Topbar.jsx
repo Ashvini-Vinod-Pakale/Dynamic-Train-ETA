@@ -25,7 +25,7 @@ function Topbar({
 
       {/* PAGE NAME */}
       <div className="topbar-page-name">
-        <span>Dynamic Train ETA</span>
+        <span>RailDurDrishti</span>
         <strong>{currentPageTitle}</strong>
       </div>
 

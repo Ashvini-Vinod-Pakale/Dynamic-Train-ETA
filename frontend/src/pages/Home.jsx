@@ -13,6 +13,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import heroRailwaySceneImg from "../assets/hero-railway-scene.png";
+import railLogo from "../assets/raildurdrishti-logo.png";
 import "./Home.css";
 
 function Home({
@@ -265,7 +266,7 @@ function Home({
     lastActiveCarouselRef.current = "pipeline";
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
-    } catch (_) {}
+    } catch (_) { }
   };
 
   const handlePipelinePointerMove = (e) => {
@@ -302,7 +303,7 @@ function Home({
         if (e.currentTarget.hasPointerCapture(e.pointerId)) {
           e.currentTarget.releasePointerCapture(e.pointerId);
         }
-      } catch (_) {}
+      } catch (_) { }
     }
     isPipelinePointerDown.current = false;
     setTimeout(() => {
@@ -441,7 +442,7 @@ function Home({
     setIsDragging(true);
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
-    } catch (_) {}
+    } catch (_) { }
   };
 
   // Pointer Move (Mouse Drag & Touch Move)
@@ -478,7 +479,7 @@ function Home({
         if (e.currentTarget.hasPointerCapture(e.pointerId)) {
           e.currentTarget.releasePointerCapture(e.pointerId);
         }
-      } catch (_) {}
+      } catch (_) { }
     }
     isPointerDownRef.current = false;
     setIsDragging(false);
@@ -858,13 +859,26 @@ function Home({
 
         <div className="home-hero-content">
 
+          <img
+            src={railLogo}
+            alt="RailDurDrishti Branding"
+            style={{
+              width: "100%",
+              maxWidth: "480px",
+              height: "auto",
+              objectFit: "contain",
+              marginBottom: "-35px",
+              display: "block"
+            }}
+          />
+
           <h1 ref={heroTitleRef}>
-            Predict the journey
-            <span ref={heroTitleSpanRef}> before it happens.</span>
+            Intelligent Railway Monitoring
+            <br /><span ref={heroTitleSpanRef}>& Predictive ETA</span>
           </h1>
 
           <p className="home-hero-description" ref={heroDescRef}>
-            AI-powered dynamic train ETA and future-delay prediction for smarter, more reliable railway journeys.
+            A real-time railway intelligence platform for monitoring train movement, dynamic ETA and delay conditions using live railway data.
           </p>
 
           <div className="home-hero-search-wrapper">
@@ -968,9 +982,8 @@ function Home({
               return (
                 <article
                   key={step.id}
-                  className={`pipeline-card pipeline-coverflow-card ${step.themeClass} ${
-                    isActive ? "is-active" : "is-receded"
-                  }`}
+                  className={`pipeline-card pipeline-coverflow-card ${step.themeClass} ${isActive ? "is-active" : "is-receded"
+                    }`}
                   style={cardStyle}
                   onClick={() => handlePipelineCardClick(index)}
                   role="button"
@@ -1093,136 +1106,134 @@ function Home({
                 </button>
               )}
 
-          <div
-            className={`train-coverflow-stage ${isDragging ? "is-dragging" : ""}`}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerLeave={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onWheel={handleWheel}
-          >
-            {trainList.map((train, index) => {
-              const cardStyle = getCardStyle(index);
-              const isActive = index === activeTrain;
+              <div
+                className={`train-coverflow-stage ${isDragging ? "is-dragging" : ""}`}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerLeave={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                onWheel={handleWheel}
+              >
+                {trainList.map((train, index) => {
+                  const cardStyle = getCardStyle(index);
+                  const isActive = index === activeTrain;
 
-              return (
-                <article
-                  key={train.number || index}
-                  className={`train-coverflow-card theme-${train.theme || "indigo"} ${
-                    isActive ? "is-active" : ""
-                  }`}
-                  style={cardStyle}
-                  onClick={() => handleCardClick(train, index)}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`${train.name} - Train ${train.number}`}
-                >
-                  <div className="card-ambient-glow" />
-                  <div className="card-mesh-pattern" />
-
-                  {/* Header: Category pill & live status */}
-                  <div className="coverflow-card-header">
-                    <span
-                      className="coverflow-category-tag"
-                      style={{ backgroundColor: train.categoryColor }}
-                    >
-                      {train.category}
-                    </span>
-
-                    <span
-                      className={`coverflow-status-badge ${
-                        train.status === "Early" || train.category === "EARLY"
-                          ? "status-early"
-                          : (train.status === "On Time" ? "status-ontime" : "status-delayed")
-                      }`}
-                    >
-                      <span className="status-pulse-dot" />
-                      {train.status === "On Time" ? "ON TIME" : train.delay || (train.status === "Early" ? "EARLY" : "DELAYED")}
-                    </span>
-                  </div>
-
-                  {/* Body: Train Number, Name, Route, Telemetry */}
-                  <div className="coverflow-card-body">
-                    <div className="train-num-row">
-                      <span className="train-num-badge">
-                        <Train size={12} />
-                        TRAIN {train.number}
-                      </span>
-                      {train.platform && (
-                        <span className="train-platform-badge">{train.platform}</span>
-                      )}
-                    </div>
-
-                    <h3 className="coverflow-train-name">{train.name}</h3>
-
-                    <div className="coverflow-route">
-                      <div className="route-point">
-                        <MapPin size={11} className="route-icon" />
-                        <span className="station-name">{train.source}</span>
-                      </div>
-                      <div className="route-connector">
-                        <span className="route-dot" />
-                        <span className="route-line" />
-                        <ArrowRight size={12} className="route-arrow" />
-                      </div>
-                      <div className="route-point">
-                        <span className="station-name">{train.destination}</span>
-                      </div>
-                    </div>
-
-                    <div className="coverflow-telemetry">
-                      <div className="telemetry-item">
-                        <span className="tel-label">CRUISING</span>
-                        <span className="tel-value">{train.speed || "-- km/h"}</span>
-                      </div>
-                      <div className="telemetry-divider" />
-                      <div className="telemetry-item">
-                        <span className="tel-label">AI TRACKING</span>
-                        <span className="tel-value active-green">ACTIVE</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Footer: Action button */}
-                  <div className="coverflow-card-footer">
-                    <span className="footer-action-text">
-                      {isActive ? "Open journey analysis" : "Click to select"}
-                    </span>
-                    <button
-                      type="button"
+                  return (
+                    <article
+                      key={train.number || index}
+                      className={`train-coverflow-card theme-${train.theme || "indigo"} ${isActive ? "is-active" : ""
+                        }`}
+                      style={cardStyle}
+                      onClick={() => handleCardClick(train, index)}
+                      role="button"
                       tabIndex={0}
-                      className="footer-arrow-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (selectTrain) {
-                          selectTrain(train);
-                        } else {
-                          openSearch();
-                        }
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (selectTrain) {
-                            selectTrain(train);
-                          } else {
-                            openSearch();
-                          }
-                        }
-                      }}
-                      onPointerDown={(e) => e.stopPropagation()}
-                      aria-label={`Open journey analysis for ${train.name} (Train ${train.number})`}
-                      title="Open journey analysis"
+                      aria-label={`${train.name} - Train ${train.number}`}
                     >
-                      <ArrowRight size={13} />
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                      <div className="card-ambient-glow" />
+                      <div className="card-mesh-pattern" />
+
+                      {/* Header: Category pill & live status */}
+                      <div className="coverflow-card-header">
+                        <span
+                          className="coverflow-category-tag"
+                          style={{ backgroundColor: train.categoryColor }}
+                        >
+                          {train.category}
+                        </span>
+
+                        <span
+                          className={`coverflow-status-badge ${train.status === "Early" || train.category === "EARLY"
+                            ? "status-early"
+                            : (train.status === "On Time" ? "status-ontime" : "status-delayed")
+                            }`}
+                        >
+                          <span className="status-pulse-dot" />
+                          {train.status === "On Time" ? "ON TIME" : train.delay || (train.status === "Early" ? "EARLY" : "DELAYED")}
+                        </span>
+                      </div>
+
+                      {/* Body: Train Number, Name, Route, Telemetry */}
+                      <div className="coverflow-card-body">
+                        <div className="train-num-row">
+                          <span className="train-num-badge">
+                            <Train size={12} />
+                            TRAIN {train.number}
+                          </span>
+                          {train.platform && (
+                            <span className="train-platform-badge">{train.platform}</span>
+                          )}
+                        </div>
+
+                        <h3 className="coverflow-train-name">{train.name}</h3>
+
+                        <div className="coverflow-route">
+                          <div className="route-point">
+                            <MapPin size={11} className="route-icon" />
+                            <span className="station-name">{train.source}</span>
+                          </div>
+                          <div className="route-connector">
+                            <span className="route-dot" />
+                            <span className="route-line" />
+                            <ArrowRight size={12} className="route-arrow" />
+                          </div>
+                          <div className="route-point">
+                            <span className="station-name">{train.destination}</span>
+                          </div>
+                        </div>
+
+                        <div className="coverflow-telemetry">
+                          <div className="telemetry-item">
+                            <span className="tel-label">CRUISING</span>
+                            <span className="tel-value">{train.speed || "-- km/h"}</span>
+                          </div>
+                          <div className="telemetry-divider" />
+                          <div className="telemetry-item">
+                            <span className="tel-label">AI TRACKING</span>
+                            <span className="tel-value active-green">ACTIVE</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer: Action button */}
+                      <div className="coverflow-card-footer">
+                        <span className="footer-action-text">
+                          {isActive ? "Open journey analysis" : "Click to select"}
+                        </span>
+                        <button
+                          type="button"
+                          tabIndex={0}
+                          className="footer-arrow-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (selectTrain) {
+                              selectTrain(train);
+                            } else {
+                              openSearch();
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (selectTrain) {
+                                selectTrain(train);
+                              } else {
+                                openSearch();
+                              }
+                            }
+                          }}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          aria-label={`Open journey analysis for ${train.name} (Train ${train.number})`}
+                          title="Open journey analysis"
+                        >
+                          <ArrowRight size={13} />
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
 
               {trainList.length > 1 && (
                 <button

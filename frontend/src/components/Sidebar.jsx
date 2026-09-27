@@ -6,6 +6,7 @@ import {
   Train,
   Activity,
 } from "lucide-react";
+import railLogo from "../assets/raildurdrishti-logo.png";
 
 function Sidebar({
   activePage,
@@ -43,26 +44,22 @@ function Sidebar({
 
   return (
     <aside
-      className={`sidebar ${
-        sidebarOpen ? "open" : "collapsed"
-      }`}
+      className={`sidebar ${sidebarOpen ? "open" : "collapsed"
+        }`}
     >
       {/* BRAND */}
-      <div className="brand">
-
-        <div className="brand-icon">
-          <Train size={27} />
-        </div>
-
-        {sidebarOpen && (
-          <div className="brand-text">
-            <h2>DynamicTrain</h2>
-
-            <span>
-              AI Railway Intelligence
-            </span>
-          </div>
-        )}
+      <div className="brand" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 10px', marginBottom: '10px', textAlign: 'center' }}>
+        <img
+          src={railLogo}
+          alt="RailDurDrishti Branding"
+          style={{
+            width: '100%',
+            maxWidth: sidebarOpen ? '160px' : '65px',
+            height: 'auto',
+            objectFit: 'contain',
+            transition: 'all 0.3s'
+          }}
+        />
       </div>
 
       {/* MENU LABEL */}
@@ -79,11 +76,10 @@ function Sidebar({
           return (
             <button
               key={item.id}
-              className={`nav-item ${
-                activePage === item.id
-                  ? "active"
-                  : ""
-              }`}
+              className={`nav-item ${activePage === item.id
+                ? "active"
+                : ""
+                }`}
               onClick={() =>
                 setActivePage(item.id)
               }

@@ -13,29 +13,21 @@
 
   /* Subtle, sophisticated light railway canvas — slightly darker than pure white cards */
   background:
-    radial-gradient(
-      ellipse 950px 650px at 8% 10%,
+    radial-gradient(ellipse 950px 650px at 8% 10%,
       rgba(38, 105, 175, 0.08),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 850px 650px at 92% 36%,
+      transparent 70%),
+    radial-gradient(ellipse 850px 650px at 92% 36%,
       rgba(20, 115, 185, 0.07),
-      transparent 72%
-    ),
-    radial-gradient(
-      ellipse 1100px 750px at 50% 82%,
+      transparent 72%),
+    radial-gradient(ellipse 1100px 750px at 50% 82%,
       rgba(35, 95, 165, 0.06),
-      transparent 75%
-    ),
-    linear-gradient(
-      180deg,
+      transparent 75%),
+    linear-gradient(180deg,
       #d4dfeb 0%,
       #dbe5f0 20%,
       #d2deea 45%,
       #dae4ef 72%,
-      #cfdbe7 100%
-    );
+      #cfdbe7 100%);
 }
 
 @media (max-width: 1023px) {
@@ -65,6 +57,7 @@
 .home-page::after {
   content: none;
 }
+
 /* =========================================================
    DARK THEME — FUTURE SETTINGS SUPPORT
    ========================================================= */
@@ -81,33 +74,25 @@
   --home-node:
     rgba(72, 181, 255, 0.82);
 
-    background:
-    radial-gradient(
-      ellipse 520px 380px at 7% 12%,
+  background:
+    radial-gradient(ellipse 520px 380px at 7% 12%,
       rgba(38, 126, 205, 0.20),
-      transparent 70%
-    ),
+      transparent 70%),
 
-    radial-gradient(
-      ellipse 500px 380px at 94% 18%,
+    radial-gradient(ellipse 500px 380px at 94% 18%,
       rgba(55, 118, 195, 0.13),
-      transparent 72%
-    ),
+      transparent 72%),
 
-    radial-gradient(
-      ellipse 560px 400px at 50% 78%,
+    radial-gradient(ellipse 560px 400px at 50% 78%,
       rgba(35, 145, 175, 0.075),
-      transparent 72%
-    ),
+      transparent 72%),
 
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       #d4e7f4 0%,
       #e8f3f9 38%,
       #f3f8fb 58%,
       #e8f3f9 78%,
-      #dbeaf5 100%
-    );
+      #dbeaf5 100%);
 }
 
 
@@ -133,22 +118,19 @@
 @keyframes homeBackgroundNetwork {
   0% {
     transform:
-      translate3d(-6px, 2px, 0)
-      scale(1);
+      translate3d(-6px, 2px, 0) scale(1);
     opacity: 0.72;
   }
 
   50% {
     transform:
-      translate3d(4px, -4px, 0)
-      scale(1.015);
+      translate3d(4px, -4px, 0) scale(1.015);
     opacity: 0.92;
   }
 
   100% {
     transform:
-      translate3d(8px, 3px, 0)
-      scale(1.025);
+      translate3d(8px, 3px, 0) scale(1.025);
     opacity: 0.78;
   }
 }
@@ -163,7 +145,7 @@
 
 
 
-.home-page > * {
+.home-page>* {
   position: relative;
   z-index: 1;
 }
@@ -754,21 +736,17 @@
   z-index: 1;
   background:
     /* Horizontal readability gradient: bright/soft over text on left, completely clear for train on right */
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       rgba(244, 248, 253, 0.97) 0%,
       rgba(244, 248, 253, 0.92) 28%,
       rgba(244, 248, 253, 0.72) 44%,
       rgba(244, 248, 253, 0.30) 60%,
-      transparent 76%
-    ),
+      transparent 76%),
     /* Soft bottom blend to transition smoothly into the Intelligence Pipeline */
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       transparent 78%,
       rgba(212, 223, 235, 0.6) 93%,
-      #d4dfeb 100%
-    );
+      #d4dfeb 100%);
   pointer-events: none;
 }
 
@@ -778,6 +756,7 @@
   z-index: 2;
   width: 100%;
   max-width: 620px;
+  margin-top: -35px;
   padding-left: clamp(28px, 5.5vw, 68px);
   padding-right: 24px;
   display: flex;
@@ -787,8 +766,8 @@
 }
 
 .home-hero h1 {
-  margin: 0 0 14px;
-  font-size: clamp(34px, 3.8vw, 50px);
+  margin: 0 0 10px;
+  font-size: clamp(28px, 3.4vw, 42px);
   line-height: 1.06;
   letter-spacing: -0.045em;
   font-weight: 850;
@@ -807,10 +786,10 @@
 }
 
 .home-hero-description {
-  margin: 0 0 24px;
+  margin: 0 0 16px;
   max-width: 520px;
-  font-size: 15.5px;
-  line-height: 1.62;
+  font-size: 14px;
+  line-height: 1.5;
   color: #334155;
   font-weight: 500;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
@@ -930,19 +909,15 @@
 
   .home-hero-scene-overlay {
     background:
-      linear-gradient(
-        90deg,
+      linear-gradient(90deg,
         rgba(244, 248, 253, 0.98) 0%,
         rgba(244, 248, 253, 0.92) 50%,
         rgba(244, 248, 253, 0.50) 75%,
-        transparent 100%
-      ),
-      linear-gradient(
-        180deg,
+        transparent 100%),
+      linear-gradient(180deg,
         transparent 80%,
         rgba(212, 223, 235, 0.7) 94%,
-        #d4dfeb 100%
-      );
+        #d4dfeb 100%);
   }
 }
 
@@ -991,13 +966,11 @@
 
   .home-hero-scene-overlay {
     background:
-      linear-gradient(
-        180deg,
+      linear-gradient(180deg,
         rgba(244, 248, 253, 0.96) 0%,
         rgba(244, 248, 253, 0.90) 65%,
         rgba(244, 248, 253, 0.50) 85%,
-        #d4dfeb 100%
-      );
+        #d4dfeb 100%);
   }
 }
 
@@ -1016,7 +989,7 @@
 }
 
 /* Reduced vertical gap specifically between Intelligence Pipeline and Explore Trains */
-.home-intelligence + .home-track-divider {
+.home-intelligence+.home-track-divider {
   height: 60px;
 }
 
@@ -1242,7 +1215,7 @@
     padding: 0 3%;
   }
 
-  .home-intelligence + .home-track-divider {
+  .home-intelligence+.home-track-divider {
     height: 52px;
   }
 
@@ -1298,7 +1271,7 @@
     height: 60px;
   }
 
-  .home-intelligence + .home-track-divider {
+  .home-intelligence+.home-track-divider {
     height: 46px;
   }
 
@@ -1335,8 +1308,7 @@
   inset: 0 0 -2px 0;
   pointer-events: none;
   z-index: 0;
-  filter: drop-shadow(0 14px 32px rgba(15, 23, 42, 0.08))
-          drop-shadow(0 3px 8px rgba(15, 23, 42, 0.04));
+  filter: drop-shadow(0 14px 32px rgba(15, 23, 42, 0.08)) drop-shadow(0 3px 8px rgba(15, 23, 42, 0.04));
 }
 
 .pipeline-container-border {
@@ -1344,26 +1316,25 @@
   inset: 0;
   background: #2563eb;
   clip-path: polygon(
-    /* Top-left rounded curve (r=24px) */
-    0px 24px, 2px 15px, 7px 7px, 15px 2px, 24px 0px,
-    /* Top-right rounded curve (r=24px) */
-    calc(100% - 24px) 0px, calc(100% - 15px) 2px, calc(100% - 7px) 7px, calc(100% - 2px) 15px, 100% 24px,
-    /* Right edge down to bottom-right corner */
-    100% calc(100% - 14px - 14px),
-    calc(100% - 2px) calc(100% - 14px - 5px),
-    calc(100% - 5px) calc(100% - 14px - 2px),
-    calc(100% - 14px) calc(100% - 14px),
-    /* Irregular notched lower edge pointing toward railway tracks */
-    calc(50% + 235px) calc(100% - 14px),
-    calc(50% + 200px) 100%,
-    calc(50% - 200px) 100%,
-    calc(50% - 235px) calc(100% - 14px),
-    /* Bottom-left corner */
-    14px calc(100% - 14px),
-    5px calc(100% - 14px - 2px),
-    2px calc(100% - 14px - 5px),
-    0px calc(100% - 14px - 14px)
-  );
+      /* Top-left rounded curve (r=24px) */
+      0px 24px, 2px 15px, 7px 7px, 15px 2px, 24px 0px,
+      /* Top-right rounded curve (r=24px) */
+      calc(100% - 24px) 0px, calc(100% - 15px) 2px, calc(100% - 7px) 7px, calc(100% - 2px) 15px, 100% 24px,
+      /* Right edge down to bottom-right corner */
+      100% calc(100% - 14px - 14px),
+      calc(100% - 2px) calc(100% - 14px - 5px),
+      calc(100% - 5px) calc(100% - 14px - 2px),
+      calc(100% - 14px) calc(100% - 14px),
+      /* Irregular notched lower edge pointing toward railway tracks */
+      calc(50% + 235px) calc(100% - 14px),
+      calc(50% + 200px) 100%,
+      calc(50% - 200px) 100%,
+      calc(50% - 235px) calc(100% - 14px),
+      /* Bottom-left corner */
+      14px calc(100% - 14px),
+      5px calc(100% - 14px - 2px),
+      2px calc(100% - 14px - 5px),
+      0px calc(100% - 14px - 14px));
 }
 
 .pipeline-container-fill {
@@ -1371,26 +1342,25 @@
   inset: 1.5px;
   background: linear-gradient(180deg, #ffffff 0%, #f9fbfd 55%, #f1f5fa 100%);
   clip-path: polygon(
-    /* Top-left rounded curve */
-    0px 23px, 2px 14.5px, 6.5px 6.5px, 14.5px 2px, 23px 0px,
-    /* Top-right rounded curve */
-    calc(100% - 23px) 0px, calc(100% - 14.5px) 2px, calc(100% - 6.5px) 6.5px, calc(100% - 2px) 14.5px, 100% 23px,
-    /* Right edge down to bottom-right corner */
-    100% calc(100% - 14px - 13.5px),
-    calc(100% - 2px) calc(100% - 14px - 5px),
-    calc(100% - 5px) calc(100% - 14px - 2px),
-    calc(100% - 13.5px) calc(100% - 14px),
-    /* Irregular notched lower edge */
-    calc(50% + 235px) calc(100% - 14px),
-    calc(50% + 200px) 100%,
-    calc(50% - 200px) 100%,
-    calc(50% - 235px) calc(100% - 14px),
-    /* Bottom-left corner */
-    13.5px calc(100% - 14px),
-    5px calc(100% - 14px - 2px),
-    2px calc(100% - 14px - 5px),
-    0px calc(100% - 14px - 13.5px)
-  );
+      /* Top-left rounded curve */
+      0px 23px, 2px 14.5px, 6.5px 6.5px, 14.5px 2px, 23px 0px,
+      /* Top-right rounded curve */
+      calc(100% - 23px) 0px, calc(100% - 14.5px) 2px, calc(100% - 6.5px) 6.5px, calc(100% - 2px) 14.5px, 100% 23px,
+      /* Right edge down to bottom-right corner */
+      100% calc(100% - 14px - 13.5px),
+      calc(100% - 2px) calc(100% - 14px - 5px),
+      calc(100% - 5px) calc(100% - 14px - 2px),
+      calc(100% - 13.5px) calc(100% - 14px),
+      /* Irregular notched lower edge */
+      calc(50% + 235px) calc(100% - 14px),
+      calc(50% + 200px) 100%,
+      calc(50% - 200px) 100%,
+      calc(50% - 235px) calc(100% - 14px),
+      /* Bottom-left corner */
+      13.5px calc(100% - 14px),
+      5px calc(100% - 14px - 2px),
+      2px calc(100% - 14px - 5px),
+      0px calc(100% - 14px - 13.5px));
 }
 
 .pipeline-coverflow-wrapper {
@@ -1527,12 +1497,10 @@
   pointer-events: none;
   border-radius: 20px;
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       rgba(255, 255, 255, 0.22) 0%,
       rgba(255, 255, 255, 0.05) 26%,
-      transparent 60%
-    );
+      transparent 60%);
   z-index: 2;
 }
 
@@ -1627,6 +1595,7 @@
 
 
 @media (max-width: 1023px) {
+
   .home-intelligence,
   .home-train-explorer {
     max-width: 100%;
@@ -1641,41 +1610,37 @@
   }
 
   .pipeline-container-border {
-    clip-path: polygon(
-      0px 20px, 2px 12px, 6px 6px, 12px 2px, 20px 0px,
-      calc(100% - 20px) 0px, calc(100% - 12px) 2px, calc(100% - 6px) 6px, calc(100% - 2px) 12px, 100% 20px,
-      100% calc(100% - 12px - 12px),
-      calc(100% - 2px) calc(100% - 12px - 4px),
-      calc(100% - 4px) calc(100% - 12px - 2px),
-      calc(100% - 12px) calc(100% - 12px),
-      calc(50% + 180px) calc(100% - 12px),
-      calc(50% + 150px) 100%,
-      calc(50% - 150px) 100%,
-      calc(50% - 180px) calc(100% - 12px),
-      12px calc(100% - 12px),
-      4px calc(100% - 12px - 2px),
-      2px calc(100% - 12px - 4px),
-      0px calc(100% - 12px - 12px)
-    );
+    clip-path: polygon(0px 20px, 2px 12px, 6px 6px, 12px 2px, 20px 0px,
+        calc(100% - 20px) 0px, calc(100% - 12px) 2px, calc(100% - 6px) 6px, calc(100% - 2px) 12px, 100% 20px,
+        100% calc(100% - 12px - 12px),
+        calc(100% - 2px) calc(100% - 12px - 4px),
+        calc(100% - 4px) calc(100% - 12px - 2px),
+        calc(100% - 12px) calc(100% - 12px),
+        calc(50% + 180px) calc(100% - 12px),
+        calc(50% + 150px) 100%,
+        calc(50% - 150px) 100%,
+        calc(50% - 180px) calc(100% - 12px),
+        12px calc(100% - 12px),
+        4px calc(100% - 12px - 2px),
+        2px calc(100% - 12px - 4px),
+        0px calc(100% - 12px - 12px));
   }
 
   .pipeline-container-fill {
-    clip-path: polygon(
-      0px 19px, 2px 11.5px, 5.5px 5.5px, 11.5px 2px, 19px 0px,
-      calc(100% - 19px) 0px, calc(100% - 11.5px) 2px, calc(100% - 5.5px) 5.5px, calc(100% - 2px) 11.5px, 100% 19px,
-      100% calc(100% - 12px - 11.5px),
-      calc(100% - 2px) calc(100% - 12px - 4px),
-      calc(100% - 4px) calc(100% - 12px - 2px),
-      calc(100% - 11.5px) calc(100% - 12px),
-      calc(50% + 180px) calc(100% - 12px),
-      calc(50% + 150px) 100%,
-      calc(50% - 150px) 100%,
-      calc(50% - 180px) calc(100% - 12px),
-      11.5px calc(100% - 12px),
-      4px calc(100% - 12px - 2px),
-      2px calc(100% - 12px - 4px),
-      0px calc(100% - 12px - 11.5px)
-    );
+    clip-path: polygon(0px 19px, 2px 11.5px, 5.5px 5.5px, 11.5px 2px, 19px 0px,
+        calc(100% - 19px) 0px, calc(100% - 11.5px) 2px, calc(100% - 5.5px) 5.5px, calc(100% - 2px) 11.5px, 100% 19px,
+        100% calc(100% - 12px - 11.5px),
+        calc(100% - 2px) calc(100% - 12px - 4px),
+        calc(100% - 4px) calc(100% - 12px - 2px),
+        calc(100% - 11.5px) calc(100% - 12px),
+        calc(50% + 180px) calc(100% - 12px),
+        calc(50% + 150px) 100%,
+        calc(50% - 150px) 100%,
+        calc(50% - 180px) calc(100% - 12px),
+        11.5px calc(100% - 12px),
+        4px calc(100% - 12px - 2px),
+        2px calc(100% - 12px - 4px),
+        0px calc(100% - 12px - 11.5px));
   }
 
   .home-trains-container-backdrop {
@@ -1710,6 +1675,7 @@
 }
 
 @media (max-width: 640px) {
+
   .home-intelligence,
   .home-train-explorer {
     padding: 14px 8px 20px;
@@ -1721,41 +1687,37 @@
   }
 
   .pipeline-container-border {
-    clip-path: polygon(
-      0px 16px, 2px 9px, 5px 5px, 9px 2px, 16px 0px,
-      calc(100% - 16px) 0px, calc(100% - 9px) 2px, calc(100% - 5px) 5px, calc(100% - 2px) 9px, 100% 16px,
-      100% calc(100% - 10px - 10px),
-      calc(100% - 2px) calc(100% - 10px - 3px),
-      calc(100% - 3px) calc(100% - 10px - 2px),
-      calc(100% - 10px) calc(100% - 10px),
-      calc(50% + 130px) calc(100% - 10px),
-      calc(50% + 105px) 100%,
-      calc(50% - 105px) 100%,
-      calc(50% - 130px) calc(100% - 10px),
-      10px calc(100% - 10px),
-      3px calc(100% - 10px - 2px),
-      2px calc(100% - 10px - 3px),
-      0px calc(100% - 10px - 10px)
-    );
+    clip-path: polygon(0px 16px, 2px 9px, 5px 5px, 9px 2px, 16px 0px,
+        calc(100% - 16px) 0px, calc(100% - 9px) 2px, calc(100% - 5px) 5px, calc(100% - 2px) 9px, 100% 16px,
+        100% calc(100% - 10px - 10px),
+        calc(100% - 2px) calc(100% - 10px - 3px),
+        calc(100% - 3px) calc(100% - 10px - 2px),
+        calc(100% - 10px) calc(100% - 10px),
+        calc(50% + 130px) calc(100% - 10px),
+        calc(50% + 105px) 100%,
+        calc(50% - 105px) 100%,
+        calc(50% - 130px) calc(100% - 10px),
+        10px calc(100% - 10px),
+        3px calc(100% - 10px - 2px),
+        2px calc(100% - 10px - 3px),
+        0px calc(100% - 10px - 10px));
   }
 
   .pipeline-container-fill {
-    clip-path: polygon(
-      0px 15px, 2px 8.5px, 4.5px 4.5px, 8.5px 2px, 15px 0px,
-      calc(100% - 15px) 0px, calc(100% - 8.5px) 2px, calc(100% - 4.5px) 4.5px, calc(100% - 2px) 8.5px, 100% 15px,
-      100% calc(100% - 10px - 9.5px),
-      calc(100% - 2px) calc(100% - 10px - 3px),
-      calc(100% - 3px) calc(100% - 10px - 2px),
-      calc(100% - 9.5px) calc(100% - 10px),
-      calc(50% + 130px) calc(100% - 10px),
-      calc(50% + 105px) 100%,
-      calc(50% - 105px) 100%,
-      calc(50% - 130px) calc(100% - 10px),
-      9.5px calc(100% - 10px),
-      3px calc(100% - 10px - 2px),
-      2px calc(100% - 10px - 3px),
-      0px calc(100% - 10px - 9.5px)
-    );
+    clip-path: polygon(0px 15px, 2px 8.5px, 4.5px 4.5px, 8.5px 2px, 15px 0px,
+        calc(100% - 15px) 0px, calc(100% - 8.5px) 2px, calc(100% - 4.5px) 4.5px, calc(100% - 2px) 8.5px, 100% 15px,
+        100% calc(100% - 10px - 9.5px),
+        calc(100% - 2px) calc(100% - 10px - 3px),
+        calc(100% - 3px) calc(100% - 10px - 2px),
+        calc(100% - 9.5px) calc(100% - 10px),
+        calc(50% + 130px) calc(100% - 10px),
+        calc(50% + 105px) 100%,
+        calc(50% - 105px) 100%,
+        calc(50% - 130px) calc(100% - 10px),
+        9.5px calc(100% - 10px),
+        3px calc(100% - 10px - 2px),
+        2px calc(100% - 10px - 3px),
+        0px calc(100% - 10px - 9.5px));
   }
 
   .home-trains-container-backdrop {
@@ -1949,11 +1911,14 @@
 }
 
 @keyframes pipelineSignalPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.85;
     box-shadow: 0 0 6px var(--card-highlight);
   }
+
   50% {
     transform: scale(1.35);
     opacity: 1;
@@ -2057,15 +2022,14 @@
   height: 2px;
 
   background:
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       transparent,
       var(--pipeline-accent),
-      transparent
-    );
+      transparent);
 
   opacity: 0.65;
 }
+
 .pipeline-card:not(.pipeline-coverflow-card) .pipeline-data {
   display: flex;
   justify-content: space-between;
@@ -2192,6 +2156,7 @@
   gap: 11px;
   color: #145ebd;
 }
+
 /*--------------*/
 /* =========================================================
    EXPLORE TRAINS — 3D COVERFLOW PERSPECTIVE CAROUSEL
@@ -2283,12 +2248,10 @@
   width: 480px;
   height: 280px;
   transform: translate(-50%, -50%);
-  background: radial-gradient(
-    ellipse at center,
-    rgba(37, 99, 235, 0.18) 0%,
-    rgba(56, 189, 248, 0.10) 40%,
-    transparent 72%
-  );
+  background: radial-gradient(ellipse at center,
+      rgba(37, 99, 235, 0.18) 0%,
+      rgba(56, 189, 248, 0.10) 40%,
+      transparent 72%);
   pointer-events: none;
   z-index: 0;
   filter: blur(14px);
@@ -2360,12 +2323,10 @@
   justify-content: space-between;
 
   /* Striking deep dark background — distinct from light page */
-  background: linear-gradient(
-    165deg,
-    rgba(14, 25, 45, 0.97) 0%,
-    rgba(8, 16, 30, 0.98) 55%,
-    rgba(4, 9, 18, 0.99) 100%
-  );
+  background: linear-gradient(165deg,
+      rgba(14, 25, 45, 0.97) 0%,
+      rgba(8, 16, 30, 0.98) 55%,
+      rgba(4, 9, 18, 0.99) 100%);
 
   border: 1px solid rgba(255, 255, 255, 0.13);
   backdrop-filter: blur(16px);
@@ -2421,11 +2382,9 @@
 .card-ambient-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    circle at 85% 12%,
-    var(--glow-col),
-    transparent 58%
-  );
+  background: radial-gradient(circle at 85% 12%,
+      var(--glow-col),
+      transparent 58%);
   pointer-events: none;
   z-index: 1;
 }
@@ -2860,6 +2819,7 @@
     font-size: 9px;
   }
 }
+
 /*---------*/
 /* =========================================================
    VALUE SECTION
@@ -3525,8 +3485,8 @@
    ========================================================= */
 
 /* Content sections elevated above animated background canvas */
-.home-page > section,
-.home-page > .home-track-divider {
+.home-page>section,
+.home-page>.home-track-divider {
   position: relative;
   z-index: 2;
   max-width: 1350px;
@@ -3574,12 +3534,10 @@
     180px 180px,
     180px 180px;
 
-  mask-image: radial-gradient(
-    ellipse 92% 80% at 50% 40%,
-    rgba(0, 0, 0, 0.95) 20%,
-    rgba(0, 0, 0, 0.45) 80%,
-    transparent 100%
-  );
+  mask-image: radial-gradient(ellipse 92% 80% at 50% 40%,
+      rgba(0, 0, 0, 0.95) 20%,
+      rgba(0, 0, 0, 0.45) 80%,
+      transparent 100%);
 
   /* Very slow, continuous, premium drift — institutional and calm */
   animation: railwayDataGridDrift 85s linear infinite;
@@ -3594,6 +3552,7 @@
       0 0,
       0 0;
   }
+
   100% {
     background-position:
       180px 180px,
@@ -3621,12 +3580,10 @@
   left: -200px;
   top: 5%;
 
-  background: radial-gradient(
-    circle,
-    rgba(45, 137, 214, 0.14),
-    rgba(45, 137, 214, 0.04) 45%,
-    transparent 72%
-  );
+  background: radial-gradient(circle,
+      rgba(45, 137, 214, 0.14),
+      rgba(45, 137, 214, 0.04) 45%,
+      transparent 72%);
 
   filter: blur(28px);
   animation: railwayGlowFloatOne 20s ease-in-out infinite alternate;
@@ -3638,12 +3595,10 @@
   right: -240px;
   top: 35%;
 
-  background: radial-gradient(
-    circle,
-    rgba(20, 140, 205, 0.12),
-    rgba(20, 140, 205, 0.035) 45%,
-    transparent 73%
-  );
+  background: radial-gradient(circle,
+      rgba(20, 140, 205, 0.12),
+      rgba(20, 140, 205, 0.035) 45%,
+      transparent 73%);
 
   filter: blur(32px);
   animation: railwayGlowFloatTwo 24s ease-in-out infinite alternate;
@@ -3653,6 +3608,7 @@
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
+
   100% {
     transform: translate3d(55px, 25px, 0) scale(1.06);
   }
@@ -3662,6 +3618,7 @@
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
+
   100% {
     transform: translate3d(-55px, -30px, 0) scale(1.05);
   }
@@ -3704,12 +3661,10 @@
   height: 2px;
   min-width: 32px;
 
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(44, 132, 207, 0.55),
-    rgba(44, 132, 207, 0.18)
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(44, 132, 207, 0.55),
+      rgba(44, 132, 207, 0.18));
 }
 
 .tech-line-left {
@@ -3730,10 +3685,13 @@
 }
 
 @keyframes techNodePulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.8;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 1;
@@ -3757,14 +3715,12 @@
   height: 2px;
   border-radius: 999px;
 
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(44, 128, 204, 0.22) 8%,
-    rgba(44, 128, 204, 0.65) 44%,
-    rgba(44, 128, 204, 0.35) 74%,
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(44, 128, 204, 0.22) 8%,
+      rgba(44, 128, 204, 0.65) 44%,
+      rgba(44, 128, 204, 0.35) 74%,
+      transparent);
 
   box-shadow: 0 0 12px rgba(44, 128, 204, 0.12);
   transform-origin: left center;
@@ -3845,13 +3801,16 @@
 }
 
 @keyframes railwayStationNodeBreath {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.75;
     transform: scale(0.9);
     box-shadow:
       0 0 0 3px rgba(37, 99, 235, 0.1),
       0 0 12px rgba(37, 99, 235, 0.25);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.15);
@@ -3891,13 +3850,11 @@
   border-bottom: 1.5px solid rgba(45, 118, 186, 0.35);
 
   /* Railway sleeper ties */
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0,
-    transparent 28px,
-    rgba(45, 118, 186, 0.16) 28px,
-    rgba(45, 118, 186, 0.16) 31px
-  );
+  background: repeating-linear-gradient(90deg,
+      transparent 0,
+      transparent 28px,
+      rgba(45, 118, 186, 0.16) 28px,
+      rgba(45, 118, 186, 0.16) 31px);
   opacity: 0.85;
 }
 
@@ -3911,14 +3868,12 @@
   height: 12px;
   border-radius: 6px;
 
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(37, 99, 235, 0.18) 20%,
-    rgba(14, 165, 233, 0.9) 50%,
-    rgba(37, 99, 235, 0.18) 80%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(37, 99, 235, 0.18) 20%,
+      rgba(14, 165, 233, 0.9) 50%,
+      rgba(37, 99, 235, 0.18) 80%,
+      transparent 100%);
 
   filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.6));
   animation: railwayCorridorTravelOne 13s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -3929,13 +3884,17 @@
     left: -120px;
     opacity: 0;
   }
+
   6% {
     opacity: 1;
   }
+
   90% {
     opacity: 1;
   }
-  98%, 100% {
+
+  98%,
+  100% {
     left: calc(100% + 40px);
     opacity: 0;
   }
@@ -3957,13 +3916,11 @@
   border-top: 1.5px solid rgba(45, 118, 186, 0.3);
   border-bottom: 1.5px solid rgba(45, 118, 186, 0.3);
 
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0,
-    transparent 32px,
-    rgba(45, 118, 186, 0.14) 32px,
-    rgba(45, 118, 186, 0.14) 35px
-  );
+  background: repeating-linear-gradient(90deg,
+      transparent 0,
+      transparent 32px,
+      rgba(45, 118, 186, 0.14) 32px,
+      rgba(45, 118, 186, 0.14) 35px);
   opacity: 0.8;
 }
 
@@ -3976,14 +3933,12 @@
   height: 12px;
   border-radius: 6px;
 
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(16, 185, 129, 0.18) 20%,
-    rgba(16, 185, 129, 0.9) 50%,
-    rgba(16, 185, 129, 0.18) 80%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(16, 185, 129, 0.18) 20%,
+      rgba(16, 185, 129, 0.9) 50%,
+      rgba(16, 185, 129, 0.18) 80%,
+      transparent 100%);
 
   filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5));
   animation: railwayCorridorTravelTwo 15s cubic-bezier(0.4, 0, 0.2, 1) infinite 5s;
@@ -3994,13 +3949,17 @@
     left: -130px;
     opacity: 0;
   }
+
   6% {
     opacity: 1;
   }
+
   90% {
     opacity: 1;
   }
-  98%, 100% {
+
+  98%,
+  100% {
     left: calc(100% + 40px);
     opacity: 0;
   }
@@ -4059,10 +4018,13 @@
 }
 
 @keyframes railwaySignalBreathe {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.85;
   }
+
   50% {
     transform: scale(1.15);
     opacity: 1;
@@ -4093,13 +4055,11 @@
   border-top: 1.5px solid rgba(45, 118, 186, 0.28);
   border-bottom: 1.5px solid rgba(45, 118, 186, 0.28);
 
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0,
-    transparent 36px,
-    rgba(45, 118, 186, 0.12) 36px,
-    rgba(45, 118, 186, 0.12) 39px
-  );
+  background: repeating-linear-gradient(90deg,
+      transparent 0,
+      transparent 36px,
+      rgba(45, 118, 186, 0.12) 36px,
+      rgba(45, 118, 186, 0.12) 39px);
 }
 
 .home-hero-bottom-rail {
@@ -4121,15 +4081,13 @@
   top: 32px;
   height: 2px;
 
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(40, 128, 203, 0.38) 9%,
-    rgba(40, 128, 203, 0.8) 35%,
-    rgba(40, 128, 203, 0.62) 70%,
-    rgba(40, 128, 203, 0.28) 90%,
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(40, 128, 203, 0.38) 9%,
+      rgba(40, 128, 203, 0.8) 35%,
+      rgba(40, 128, 203, 0.62) 70%,
+      rgba(40, 128, 203, 0.28) 90%,
+      transparent);
 
   box-shadow: 0 10px 0 rgba(40, 128, 203, 0.18);
 }
@@ -4142,15 +4100,13 @@
   top: -10px;
   height: 24px;
 
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0,
-    transparent 35px,
-    rgba(43, 125, 194, 0.16) 36px,
-    rgba(43, 125, 194, 0.16) 39px,
-    transparent 40px,
-    transparent 74px
-  );
+  background: repeating-linear-gradient(90deg,
+      transparent 0,
+      transparent 35px,
+      rgba(43, 125, 194, 0.16) 36px,
+      rgba(43, 125, 194, 0.16) 39px,
+      transparent 40px,
+      transparent 74px);
   opacity: 0.9;
 }
 
@@ -4317,14 +4273,12 @@
   transform: translateY(-50%);
   border-radius: 999px;
 
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(37, 99, 235, 0.15) 15%,
-    rgba(14, 165, 233, 0.95) 50%,
-    rgba(37, 99, 235, 0.2) 85%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(37, 99, 235, 0.15) 15%,
+      rgba(14, 165, 233, 0.95) 50%,
+      rgba(37, 99, 235, 0.2) 85%,
+      transparent 100%);
 
   box-shadow:
     0 0 12px rgba(14, 165, 233, 0.35),
@@ -4340,15 +4294,19 @@
     left: 2%;
     opacity: 0;
   }
+
   8% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.95;
   }
+
   92% {
     opacity: 1;
   }
+
   100% {
     left: 93%;
     opacity: 0;
